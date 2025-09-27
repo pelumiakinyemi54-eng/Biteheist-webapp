@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/biteheist-favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BiteHeist - Restaurant SEO Audit Dashboard</title>
+    <meta name="description" content="Comprehensive SEO audit platform for restaurants. Analyze your online presence, compare with competitors, and get actionable recommendations." />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://biteheist.com/" />
+    <meta property="og:title" content="BiteHeist - Restaurant SEO Audit Dashboard" />
+    <meta property="og:description" content="Discover what's holding your restaurant back online. Get comprehensive SEO audits and competitor analysis." />
+    <meta property="og:image" content="/biteheist-og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://biteheist.com/" />
+    <meta property="twitter:title" content="BiteHeist - Restaurant SEO Audit Dashboard" />
+    <meta property="twitter:description" content="Discover what's holding your restaurant back online. Get comprehensive SEO audits and competitor analysis." />
+    <meta property="twitter:image" content="/biteheist-og-image.png" />
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://maps.googleapis.com">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <style>
+      /* Loading screen styles */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+      
+      .loader-content {
+        text-align: center;
+        color: white;
+      }
+      
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loader-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      
+      .loader-subtext {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        opacity: 0.8;
+      }
+      
+      /* Hide loader when Vue app loads */
+      .loaded #initial-loader {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Initial Loading Screen -->
+    <div id="initial-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">BiteHeist</div>
+        <div class="loader-subtext">Loading restaurant audit platform...</div>
+      </div>
+    </div>
+    
+    <!-- Vue App Container -->
+    <div id="app"></div>
+    
+    <!-- Remove loading screen when Vue loads -->
+    <script>
+      // Hide loader after Vue app mounts
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          document.body.classList.add('loaded');
+          // Remove loader from DOM after transition
+          setTimeout(() => {
+            const loader = document.getElementById('initial-loader');
+            if (loader) loader.remove();
+          }, 500);
+        }, 1000); // Show loader for at least 1 second
+      });
+    </script>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
