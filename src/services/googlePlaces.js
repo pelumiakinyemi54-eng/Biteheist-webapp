@@ -205,7 +205,7 @@ class GooglePlacesService {
       {
         place_id: 'comp_2',
         name: 'Burger Barn',
-        vicinity: '0.4 miles away', 
+        vicinity: '0.4 miles away',
         rating: 3.9,
         user_ratings_total: 156,
         price_level: 1
@@ -235,6 +235,187 @@ class GooglePlacesService {
         price_level: 2
       }
     ]
+  }
+
+  /**
+   * Run audit for a restaurant using backend API
+   */
+  async auditRestaurant(placeId) {
+    try {
+      const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003'
+      const response = await axios.post(`${BACKEND_URL}/api/restaurants/${placeId}/audit`)
+
+      if (response.data && response.data.success) {
+        return this.transformAuditData(response.data.audit)
+      } else {
+        console.warn('Backend audit failed, using mock data')
+        return this.getMockAuditData(placeId)
+      }
+    } catch (error) {
+      console.error('Audit API error:', error)
+      return this.getMockAuditData(placeId)
+    }
+  }
+
+  /**
+   * Transform backend audit data to frontend format
+   */
+  transformAuditData(audit) {
+    return {
+      restaurant: {
+        name: audit.restaurant.name,
+        address: audit.restaurant.address,
+        rating: audit.restaurant.rating,
+        total_ratings: audit.restaurant.totalRatings,
+        website: audit.restaurant.website,
+        phone: audit.restaurant.phone,
+        photos: audit.restaurant.photos || [],
+        reviews: audit.restaurant.reviews || []
+      },
+      overallScore: audit.scores.overall,
+      grade: audit.grade,
+      metrics: {
+        seo: audit.scores.seo.score,
+        performance: audit.scores.pageSpeed.score,
+        reviews: audit.scores.reviews.score,
+        responseTime: audit.scores.responseTime.score
+      },
+      competitors: audit.competitors || [],
+      seoIssues: this.transformSeoIssues(audit.scores.seo, audit.restaurant),
+      pagespeed: {
+        score: audit.scores.pageSpeed.score,
+        loadTime: audit.scores.pageSpeed.loadTime,
+        metrics: audit.scores.pageSpeed.metrics
+      },
+      revenueImpact: audit.revenueImpact,
+      actionItems: audit.actionItems || [],
+      messages: audit.messages || []
+    }
+  }
+
+  /**
+   * Transform SEO score data to issues format
+   */
+  transformSeoIssues(seoScore, restaurant) {
+    const issues = []
+
+    if (!restaurant.website) {
+      issues.push({
+        title: 'No Website Found',
+        description: 'Missing official website reduces online visibility',
+        severity: 'high',
+        impact: 'High revenue impact - customers can\'t find menu or place orders online'
+      })
+    }
+
+    if (restaurant.photos.length < 10) {
+      issues.push({
+        title: 'Insufficient Photos',
+        description: `Only ${restaurant.photos.length} photos available`,
+        severity: 'medium',
+        impact: 'Medium revenue impact - visual content drives engagement'
+      })
+    }
+
+    if (restaurant.totalRatings < 50) {
+      issues.push({
+        title: 'Low Review Count',
+        description: `Only ${restaurant.totalRatings} reviews`,
+        severity: 'medium',
+        impact: 'Affects search ranking and customer trust'
+      })
+    }
+
+    if (seoScore.score < 70) {
+      issues.push({
+        title: 'SEO Score Below Target',
+        description: 'Multiple optimization opportunities detected',
+        severity: 'high',
+        impact: 'Missing potential customers from search'
+      })
+    }
+
+    return issues
+  }
+
+  /**
+   * Mock audit data for development
+   */
+  getMockAuditData(placeId) {
+    return {
+      restaurant: {
+        name: "Talkin' Tacos",
+        address: '1234 Ocean Drive, Miami Beach, FL 33139',
+        rating: 4.2,
+        total_ratings: 156,
+        website: 'https://www.talkintacos.com',
+        phone: '(305) 555-0123'
+      },
+      overallScore: 72,
+      grade: 'B',
+      metrics: {
+        seo: 68,
+        performance: 75,
+        reviews: 84,
+        responseTime: 62
+      },
+      competitors: this.getMockCompetitors(),
+      seoIssues: [
+        {
+          title: 'Title Tag Too Short',
+          description: 'Your title tag is only 35 characters. Expand to 50-60 characters.',
+          severity: 'medium',
+          impact: 'Lost clicks from search results'
+        },
+        {
+          title: 'Missing Schema Markup',
+          description: 'No Restaurant schema found. This helps Google understand your business.',
+          severity: 'high',
+          impact: 'Lower rankings in local search'
+        }
+      ],
+      pagespeed: {
+        score: 75,
+        loadTime: 3.2,
+        metrics: {
+          firstContentfulPaint: 1.8,
+          largestContentfulPaint: 2.5,
+          cumulativeLayoutShift: 0.12
+        }
+      },
+      revenueImpact: {
+        monthly: 2400,
+        annual: 28800,
+        breakdown: {
+          seo: 800,
+          speed: 600,
+          reviews: 600,
+          response: 400
+        }
+      },
+      actionItems: [
+        {
+          priority: 'high',
+          category: 'SEO',
+          title: 'Add Restaurant Schema Markup',
+          description: 'Implement structured data to improve search visibility',
+          estimatedRevenue: 800,
+          timeframe: '1-2 weeks'
+        },
+        {
+          priority: 'high',
+          category: 'Website',
+          title: 'Optimize Page Load Speed',
+          description: 'Reduce load time from 3.2s to under 2.5s',
+          estimatedRevenue: 600,
+          timeframe: '1 week'
+        }
+      ],
+      messages: {
+        primary: 'You could be earning $2,400 more per month',
+        secondary: 'Your SEO score of 72 is good, but optimization could increase revenue by 35%'
+      }
+    }
   }
 }
 

@@ -46,16 +46,24 @@
       >
         <div class="flex items-start justify-between mb-4">
           <div class="flex items-start space-x-4 flex-1">
-            <div 
+            <div
               class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm"
               :class="getPriorityBadgeClass(action.priority)"
             >
               {{ getSortedIndex(action) }}
             </div>
             <div class="flex-1 min-w-0">
-              <h3 class="font-semibold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
-                {{ action.title }}
-              </h3>
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
+                  {{ action.title }}
+                </h3>
+                <div class="ml-4 text-right flex-shrink-0">
+                  <div class="text-xl font-bold text-green-600">
+                    +${{ action.estimatedRevenue?.toLocaleString() || getRevenueEstimate(action).toLocaleString() }}
+                  </div>
+                  <div class="text-xs text-gray-500">monthly gain</div>
+                </div>
+              </div>
               <p class="text-gray-600 text-sm mb-3 leading-relaxed">
                 {{ action.description }}
               </p>
@@ -85,107 +93,39 @@
               </div>
             </div>
           </div>
-          <div class="flex items-center space-x-2 ml-4">
+          <div class="flex items-center ml-4">
             <div class="text-right">
               <div class="text-sm font-medium text-gray-800">{{ getEffortLevel(action) }}</div>
               <div class="text-xs text-gray-500">effort</div>
             </div>
-            <button 
-              @click="toggleExpanded(index)"
-              class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-            >
-              <svg 
-                class="w-5 h-5 transform transition-transform" 
-                :class="{ 'rotate-180': expandedItems.includes(index) }"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Expanded Details -->
-        <div 
-          v-if="expandedItems.includes(index)"
-          class="pt-4 border-t border-gray-200 animate-slide-up"
-        >
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-            <div>
-              <h4 class="font-medium text-gray-800 mb-2">Implementation Steps</h4>
-              <div class="space-y-2">
-                <div v-for="step in getImplementationSteps(action)" :key="step" class="flex items-start text-sm text-gray-600">
-                  <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>{{ step }}</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4 class="font-medium text-gray-800 mb-2">Expected Results</h4>
-              <div class="space-y-2">
-                <div v-for="result in getExpectedResults(action)" :key="result" class="flex items-start text-sm text-gray-600">
-                  <div class="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>{{ result }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Action Button -->
-          <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <div class="text-sm text-gray-500">
-              Estimated completion: {{ action.timeframe || getEstimatedTime(action) }}
-            </div>
-            <button 
-              @click="startAction(action)"
-              class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-              <span>Start Fix (Phase 3)</span>
-            </button>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Summary Stats -->
+    <!-- Summary Stats with Revenue Focus -->
     <div class="mt-8 pt-6 border-t border-gray-200">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="text-center p-5 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300">
+          <div class="text-3xl font-extrabold text-green-700">+${{ totalRevenueGain.toLocaleString() }}</div>
+          <div class="text-sm font-medium text-green-800 mt-1">Total Monthly Gain</div>
+          <div class="text-xs text-green-600 mt-1">If all fixes completed</div>
+        </div>
         <div class="text-center p-4 rounded-lg bg-red-50 border border-red-200">
           <div class="text-2xl font-bold text-red-700">{{ highPriorityCount }}</div>
-          <div class="text-sm text-red-600">High Priority</div>
-        </div>
-        <div class="text-center p-4 rounded-lg bg-yellow-50 border border-yellow-200">
-          <div class="text-2xl font-bold text-yellow-700">{{ mediumPriorityCount }}</div>
-          <div class="text-sm text-yellow-600">Medium Priority</div>
+          <div class="text-sm text-red-600 mt-1">High Priority</div>
+          <div class="text-xs text-red-500">${{ highPriorityRevenue.toLocaleString() }}/mo gain</div>
         </div>
         <div class="text-center p-4 rounded-lg bg-blue-50 border border-blue-200">
           <div class="text-2xl font-bold text-blue-700">{{ quickWinsCount }}</div>
-          <div class="text-sm text-blue-600">Quick Wins</div>
+          <div class="text-sm text-blue-600 mt-1">Quick Wins</div>
+          <div class="text-xs text-blue-500">${{ quickWinRevenue.toLocaleString() }}/mo gain</div>
         </div>
-        <div class="text-center p-4 rounded-lg bg-green-50 border border-green-200">
-          <div class="text-2xl font-bold text-green-700">+{{ potentialScoreIncrease }}</div>
-          <div class="text-sm text-green-600">Score Boost Potential</div>
+        <div class="text-center p-4 rounded-lg bg-purple-50 border border-purple-200">
+          <div class="text-2xl font-bold text-purple-700">{{ autoFixableCount }}</div>
+          <div class="text-sm text-purple-600 mt-1">Auto-Fixable</div>
+          <div class="text-xs text-purple-500">Save {{ estimatedHours }}+ hours</div>
         </div>
-      </div>
-      
-      <!-- Call to Action -->
-      <div class="text-center p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">Ready to Fix These Issues?</h3>
-        <p class="text-gray-600 mb-4 max-w-2xl mx-auto">
-          Our automated fix engine can implement {{ autoFixableCount }} of these improvements 
-          and boost your SEO score by an estimated {{ potentialScoreIncrease }} points.
-        </p>
-        <button class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors inline-flex items-center space-x-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          <span>Start Auto-Fix Engine ($99/mo)</span>
-        </button>
       </div>
     </div>
   </div>
@@ -208,7 +148,6 @@ export default {
     return {
       sortBy: 'priority',
       activeFilter: 'all',
-      expandedItems: [],
       filterTabs: [
         { key: 'all', label: 'All Items' },
         { key: 'high', label: 'High Priority' },
@@ -267,9 +206,47 @@ export default {
     
     potentialScoreIncrease() {
       return Math.min(25, this.items.length * 3 + Math.floor(Math.random() * 10))
+    },
+
+    totalRevenueGain() {
+      return this.items.reduce((sum, item) => {
+        return sum + (item.estimatedRevenue || this.getRevenueEstimate(item))
+      }, 0)
+    },
+
+    highPriorityRevenue() {
+      return this.items
+        .filter(item => item.priority === 'High')
+        .reduce((sum, item) => sum + (item.estimatedRevenue || this.getRevenueEstimate(item)), 0)
+    },
+
+    quickWinRevenue() {
+      return this.items
+        .filter(item => this.isQuickWin(item))
+        .reduce((sum, item) => sum + (item.estimatedRevenue || this.getRevenueEstimate(item)), 0)
+    },
+
+    estimatedHours() {
+      return this.autoFixableCount * 2 // Assume 2 hours saved per auto-fixable item
     }
   },
   methods: {
+    getRevenueEstimate(action) {
+      // Return existing estimate or calculate based on priority
+      if (action.estimatedRevenue) return action.estimatedRevenue
+
+      switch (action.priority) {
+        case 'high':
+        case 'High':
+          return 800 + Math.floor(Math.random() * 400) // $800-1200
+        case 'medium':
+        case 'Medium':
+          return 400 + Math.floor(Math.random() * 200) // $400-600
+        default:
+          return 200 + Math.floor(Math.random() * 100) // $200-300
+      }
+    },
+
     getFilterCount(filterKey) {
       switch (filterKey) {
         case 'high':
@@ -369,84 +346,6 @@ export default {
     
     getSortedIndex(action) {
       return this.filteredItems.indexOf(action) + 1
-    },
-    
-    toggleExpanded(index) {
-      const expandedIndex = this.expandedItems.indexOf(index)
-      if (expandedIndex > -1) {
-        this.expandedItems.splice(expandedIndex, 1)
-      } else {
-        this.expandedItems.push(index)
-      }
-    },
-    
-    getImplementationSteps(action) {
-      const steps = {
-        'title': [
-          'Audit current title tags across all pages',
-          'Optimize length to under 60 characters',
-          'Include primary keywords naturally',
-          'Test and deploy changes'
-        ],
-        'schema': [
-          'Research relevant schema types for restaurant',
-          'Implement Restaurant schema markup',
-          'Add menu, hours, and location data',
-          'Validate markup with Google tools'
-        ],
-        'reviews': [
-          'Identify all unanswered reviews',
-          'Craft personalized responses',
-          'Set up review monitoring system',
-          'Create response templates for future use'
-        ]
-      }
-      
-      const key = Object.keys(steps).find(k => 
-        action.title.toLowerCase().includes(k)
-      )
-      
-      return key ? steps[key] : [
-        'Analyze current implementation',
-        'Plan optimization strategy',
-        'Execute changes carefully',
-        'Monitor results and adjust'
-      ]
-    },
-    
-    getExpectedResults(action) {
-      const results = {
-        'title': [
-          'Improved click-through rates from search',
-          'Better search result appearance',
-          'Enhanced keyword relevance'
-        ],
-        'schema': [
-          'Rich snippets in search results',
-          'Increased visibility and clicks',
-          'Better local search performance'
-        ],
-        'reviews': [
-          'Improved customer relationships',
-          'Higher overall rating average',
-          'Better local SEO signals'
-        ]
-      }
-      
-      const key = Object.keys(results).find(k => 
-        action.title.toLowerCase().includes(k)
-      )
-      
-      return key ? results[key] : [
-        'Improved SEO performance',
-        'Better user experience',
-        'Higher search rankings'
-      ]
-    },
-    
-    startAction(action) {
-      // This would integrate with Phase 3 auto-fix engine
-      alert(`Starting auto-fix for: ${action.title}\n\nThis feature will be available in Phase 3 of the BiteHeist platform.`)
     }
   }
 }

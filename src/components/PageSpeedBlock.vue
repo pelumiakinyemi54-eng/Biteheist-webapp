@@ -1,186 +1,149 @@
 <template>
-  <div class="bg-white rounded-2xl p-6 mb-8 card-shadow">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-bold text-gray-800">PageSpeed Insights</h2>
-      <div class="flex items-center space-x-2 text-sm text-gray-500">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-        </svg>
-        <span>Mobile Analysis</span>
+  <div class="bg-white rounded-2xl p-8 mb-8 card-shadow">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-2xl font-bold text-gray-900">Website Speed Analysis</h2>
+        <div class="flex items-center space-x-2 px-4 py-2 bg-blue-50 rounded-lg">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          <span class="text-sm font-semibold text-blue-800">Mobile</span>
+        </div>
+      </div>
+      <p class="text-gray-600">How fast your website loads affects customer experience and revenue</p>
+    </div>
+
+    <!-- Main Speed Score - BIG and CLEAR -->
+    <div class="mb-10 p-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
+      <div class="text-center">
+        <div class="text-sm text-gray-600 uppercase tracking-wide font-semibold mb-3">Overall Speed Score</div>
+        <div class="flex items-center justify-center mb-4">
+          <div class="relative">
+            <!-- Circular Progress -->
+            <svg class="transform -rotate-90" width="180" height="180">
+              <circle
+                cx="90"
+                cy="90"
+                r="70"
+                stroke="#e5e7eb"
+                stroke-width="12"
+                fill="none"
+              />
+              <circle
+                cx="90"
+                cy="90"
+                r="70"
+                :stroke="getScoreColor(metrics.performance)"
+                stroke-width="12"
+                fill="none"
+                :stroke-dasharray="circumference"
+                :stroke-dashoffset="getDashOffset(metrics.performance)"
+                stroke-linecap="round"
+                class="progress-circle"
+              />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-5xl font-bold" :style="{ color: getScoreColor(metrics.performance) }">
+                  {{ metrics.performance }}
+                </div>
+                <div class="text-sm text-gray-600 font-medium">out of 100</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-lg font-semibold" :class="getScoreTextClass(metrics.performance)">
+          {{ getScoreLabel(metrics.performance) }}
+        </div>
+        <div class="text-sm text-gray-600 mt-2">
+          {{ getScoreExplanation(metrics.performance) }}
+        </div>
       </div>
     </div>
-    
-    <!-- Core Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="text-center p-6 rounded-xl border-2 border-gray-200 hover:shadow-md transition-all duration-200">
-        <div class="mb-4">
-          <div 
-            class="text-4xl font-bold mb-2 transition-all duration-1000" 
-            :class="getScoreColor(metrics.performance)"
-          >
-            {{ metrics.performance }}
+
+    <!-- What This Means - Simple Cards -->
+    <div class="mb-10">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">What This Means For You</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Load Time Card -->
+        <div class="p-6 rounded-xl border-2 transition-all hover:shadow-lg"
+             :class="metrics.lcp <= 2.5 ? 'border-green-200 bg-green-50' : metrics.lcp <= 4 ? 'border-yellow-200 bg-yellow-50' : 'border-red-200 bg-red-50'">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold text-gray-700">Page Load Time</div>
+            <svg class="w-5 h-5" :class="metrics.lcp <= 2.5 ? 'text-green-600' : metrics.lcp <= 4 ? 'text-yellow-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
           </div>
-          <div class="text-sm font-medium text-gray-700">Performance</div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-          <div 
-            class="h-3 rounded-full transition-all duration-1500" 
-            :class="getScoreBarColor(metrics.performance)"
-            :style="`width: ${metrics.performance}%`"
-          ></div>
-        </div>
-        <div class="text-xs text-gray-500">{{ getScoreDescription(metrics.performance) }}</div>
-      </div>
-      
-      <div class="text-center p-6 rounded-xl border-2 border-gray-200 hover:shadow-md transition-all duration-200">
-        <div class="mb-4">
-          <div 
-            class="text-4xl font-bold mb-2 transition-all duration-1000" 
-            :class="getScoreColor(metrics.seo)"
-          >
-            {{ metrics.seo }}
-          </div>
-          <div class="text-sm font-medium text-gray-700">SEO</div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-          <div 
-            class="h-3 rounded-full transition-all duration-1500" 
-            :class="getScoreBarColor(metrics.seo)"
-            :style="`width: ${metrics.seo}%`"
-          ></div>
-        </div>
-        <div class="text-xs text-gray-500">{{ getScoreDescription(metrics.seo) }}</div>
-      </div>
-      
-      <div class="text-center p-6 rounded-xl border-2 border-gray-200 hover:shadow-md transition-all duration-200">
-        <div class="mb-4">
-          <div 
-            class="text-4xl font-bold mb-2 transition-all duration-1000" 
-            :class="getLCPColor(metrics.lcp)"
-          >
+          <div class="text-4xl font-bold mb-2" :class="metrics.lcp <= 2.5 ? 'text-green-700' : metrics.lcp <= 4 ? 'text-yellow-700' : 'text-red-700'">
             {{ metrics.lcp }}s
           </div>
-          <div class="text-sm font-medium text-gray-700">LCP</div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-          <div 
-            class="h-3 rounded-full transition-all duration-1500" 
-            :class="getLCPBarColor(metrics.lcp)"
-            :style="`width: ${getLCPPercentage(metrics.lcp)}%`"
-          ></div>
-        </div>
-        <div class="text-xs" :class="metrics.lcp > 4 ? 'text-red-500' : 'text-green-500'">
-          {{ metrics.lcp > 4 ? '27% traffic loss risk' : 'Good loading speed' }}
-        </div>
-      </div>
-      
-      <div class="text-center p-6 rounded-xl border-2 border-gray-200 hover:shadow-md transition-all duration-200">
-        <div class="mb-4">
-          <div 
-            class="text-4xl font-bold mb-2 transition-all duration-1000" 
-            :class="getScoreColor(metrics.accessibility)"
-          >
-            {{ metrics.accessibility }}
+          <div class="text-xs font-medium mb-2" :class="metrics.lcp <= 2.5 ? 'text-green-600' : metrics.lcp <= 4 ? 'text-yellow-600' : 'text-red-600'">
+            {{ metrics.lcp <= 2.5 ? '✓ Fast' : metrics.lcp <= 4 ? '⚠ Slow' : '✗ Very Slow' }}
           </div>
-          <div class="text-sm font-medium text-gray-700">Accessibility</div>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3 mb-3">
-          <div 
-            class="h-3 rounded-full transition-all duration-1500" 
-            :class="getScoreBarColor(metrics.accessibility)"
-            :style="`width: ${metrics.accessibility}%`"
-          ></div>
-        </div>
-        <div class="text-xs text-gray-500">{{ getScoreDescription(metrics.accessibility) }}</div>
-      </div>
-    </div>
-    
-    <!-- Core Web Vitals Section -->
-    <div class="mb-8">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-        </svg>
-        Core Web Vitals
-      </h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 border border-gray-200 rounded-lg">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">Largest Contentful Paint</span>
-            <span class="text-xs px-2 py-1 rounded-full" :class="getLCPBadge(metrics.lcp)">
-              {{ metrics.lcp > 4 ? 'Poor' : metrics.lcp > 2.5 ? 'Needs Improvement' : 'Good' }}
-            </span>
+          <div class="text-xs text-gray-600">
+            {{ metrics.lcp > 4 ? '27% of visitors may leave' : metrics.lcp > 2.5 ? 'Could be faster' : 'Good loading speed' }}
           </div>
-          <div class="text-2xl font-bold" :class="getLCPColor(metrics.lcp)">{{ metrics.lcp }}s</div>
-          <div class="text-xs text-gray-500 mt-1">Target: &lt; 2.5s</div>
         </div>
-        
-        <div class="p-4 border border-gray-200 rounded-lg">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">First Input Delay</span>
-            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Good</span>
+
+        <!-- SEO Impact -->
+        <div class="p-6 rounded-xl border-2 transition-all hover:shadow-lg"
+             :class="metrics.seo >= 90 ? 'border-green-200 bg-green-50' : metrics.seo >= 50 ? 'border-yellow-200 bg-yellow-50' : 'border-red-200 bg-red-50'">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold text-gray-700">SEO Score</div>
+            <svg class="w-5 h-5" :class="metrics.seo >= 90 ? 'text-green-600' : metrics.seo >= 50 ? 'text-yellow-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
           </div>
-          <div class="text-2xl font-bold text-green-600">{{ mockFID }}ms</div>
-          <div class="text-xs text-gray-500 mt-1">Target: &lt; 100ms</div>
+          <div class="text-4xl font-bold mb-2" :class="metrics.seo >= 90 ? 'text-green-700' : metrics.seo >= 50 ? 'text-yellow-700' : 'text-red-700'">
+            {{ metrics.seo }}
+          </div>
+          <div class="text-xs font-medium mb-2" :class="metrics.seo >= 90 ? 'text-green-600' : metrics.seo >= 50 ? 'text-yellow-600' : 'text-red-600'">
+            {{ metrics.seo >= 90 ? '✓ Excellent' : metrics.seo >= 50 ? '⚠ Needs Work' : '✗ Poor' }}
+          </div>
+          <div class="text-xs text-gray-600">
+            {{ metrics.seo >= 90 ? 'Good for Google rankings' : 'Hurting search visibility' }}
+          </div>
         </div>
-        
-        <div class="p-4 border border-gray-200 rounded-lg">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">Cumulative Layout Shift</span>
-            <span class="text-xs px-2 py-1 rounded-full" :class="getCLSBadge(mockCLS)">
-              {{ mockCLS > 0.25 ? 'Poor' : mockCLS > 0.1 ? 'Needs Improvement' : 'Good' }}
-            </span>
+
+        <!-- User Experience -->
+        <div class="p-6 rounded-xl border-2 transition-all hover:shadow-lg"
+             :class="mockCLS <= 0.1 ? 'border-green-200 bg-green-50' : mockCLS <= 0.25 ? 'border-yellow-200 bg-yellow-50' : 'border-red-200 bg-red-50'">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold text-gray-700">Page Stability</div>
+            <svg class="w-5 h-5" :class="mockCLS <= 0.1 ? 'text-green-600' : mockCLS <= 0.25 ? 'text-yellow-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+            </svg>
           </div>
-          <div class="text-2xl font-bold" :class="getCLSColor(mockCLS)">{{ mockCLS }}</div>
-          <div class="text-xs text-gray-500 mt-1">Target: &lt; 0.1</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Performance Opportunities -->
-    <div class="mb-8">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-        </svg>
-        Performance Opportunities
-      </h3>
-      
-      <div class="space-y-3">
-        <div v-for="opportunity in performanceOpportunities" :key="opportunity.type" 
-             class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-          <div class="flex-1">
-            <div class="font-medium text-gray-800 mb-1">{{ opportunity.title }}</div>
-            <div class="text-sm text-gray-600">{{ opportunity.description }}</div>
+          <div class="text-4xl font-bold mb-2" :class="mockCLS <= 0.1 ? 'text-green-700' : mockCLS <= 0.25 ? 'text-yellow-700' : 'text-red-700'">
+            {{ mockCLS }}
           </div>
-          <div class="flex items-center space-x-3">
-            <div class="text-right">
-              <div class="text-sm font-semibold text-indigo-600">{{ opportunity.savings }}</div>
-              <div class="text-xs text-gray-500">potential savings</div>
-            </div>
-            <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="opportunity.priority === 'high' ? 'bg-red-100 text-red-600' : opportunity.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-            </div>
+          <div class="text-xs font-medium mb-2" :class="mockCLS <= 0.1 ? 'text-green-600' : mockCLS <= 0.25 ? 'text-yellow-600' : 'text-red-600'">
+            {{ mockCLS <= 0.1 ? '✓ Stable' : mockCLS <= 0.25 ? '⚠ Shaky' : '✗ Unstable' }}
+          </div>
+          <div class="text-xs text-gray-600">
+            {{ mockCLS > 0.25 ? 'Content jumps around' : 'Smooth experience' }}
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Technical Recommendations -->
-    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-      <h3 class="font-semibold text-blue-800 mb-3 flex items-center">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        Critical Speed Issues
-      </h3>
-      <div class="space-y-2 text-sm text-blue-800">
-        <div v-for="issue in criticalIssues" :key="issue.type" class="flex items-start">
-          <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-          <span>{{ issue.message }}</span>
+
+    <!-- Bottom Warning if needed -->
+    <div v-if="metrics.performance < 50 || metrics.lcp > 4" class="p-6 bg-red-50 border-2 border-red-200 rounded-xl">
+      <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold text-red-900 mb-2">⚠️ Critical Speed Issue</h4>
+          <p class="text-sm text-red-800">
+            Your slow website is costing you customers. For every 1 second delay, conversions drop by 7%.
+            <span class="font-bold">You could be losing ${{ calculateSpeedLoss() }}/month</span> due to slow load times.
+          </p>
         </div>
       </div>
     </div>
@@ -209,125 +172,46 @@ export default {
   data() {
     return {
       mockFID: Math.floor(Math.random() * 150 + 50),
-      mockCLS: (Math.random() * 0.3).toFixed(3),
-      performanceOpportunities: [
-        {
-          type: 'images',
-          title: 'Properly size images',
-          description: 'Serve images that are appropriately-sized to save cellular data and improve load time',
-          savings: '0.8s',
-          priority: 'high'
-        },
-        {
-          type: 'render-blocking',
-          title: 'Eliminate render-blocking resources',
-          description: 'Remove or defer JavaScript and CSS that delay first contentful paint',
-          savings: '0.6s',
-          priority: 'high'
-        },
-        {
-          type: 'unused-css',
-          title: 'Remove unused CSS',
-          description: 'Remove dead rules from stylesheets to reduce unnecessary bytes',
-          savings: '0.3s',
-          priority: 'medium'
-        },
-        {
-          type: 'caching',
-          title: 'Serve static assets with efficient cache policy',
-          description: 'A long cache lifetime can speed up repeat visits',
-          savings: '0.4s',
-          priority: 'medium'
-        }
-      ],
-      criticalIssues: []
-    }
-  },
-  computed: {
-    criticalIssuesComputed() {
-      const issues = []
-      
-      if (this.metrics.lcp > 4) {
-        issues.push({
-          type: 'lcp',
-          message: `LCP of ${this.metrics.lcp}s may cause 27% of visitors to abandon your site`
-        })
-      }
-      
-      if (this.metrics.performance < 50) {
-        issues.push({
-          type: 'performance',
-          message: 'Poor performance score affects search engine rankings'
-        })
-      }
-      
-      if (this.mockCLS > 0.25) {
-        issues.push({
-          type: 'cls',
-          message: 'High layout shifts create poor user experience'
-        })
-      }
-      
-      return issues
+      mockCLS: (Math.random() * 0.3).toFixed(2),
+      circumference: 2 * Math.PI * 70
     }
   },
   methods: {
+    getDashOffset(score) {
+      const percentage = score / 100
+      return this.circumference - (percentage * this.circumference)
+    },
     getScoreColor(score) {
-      if (score >= 90) return 'text-green-600'
-      if (score >= 50) return 'text-yellow-600'
-      return 'text-red-600'
+      if (score >= 90) return '#10b981' // green
+      if (score >= 50) return '#f59e0b' // yellow
+      return '#ef4444' // red
     },
-    
-    getScoreBarColor(score) {
-      if (score >= 90) return 'bg-green-500'
-      if (score >= 50) return 'bg-yellow-500'
-      return 'bg-red-500'
+    getScoreTextClass(score) {
+      if (score >= 90) return 'text-green-700'
+      if (score >= 50) return 'text-yellow-700'
+      return 'text-red-700'
     },
-    
-    getScoreDescription(score) {
-      if (score >= 90) return 'Good'
-      if (score >= 50) return 'Needs Improvement'
-      return 'Poor'
+    getScoreLabel(score) {
+      if (score >= 90) return '✓ Fast Website'
+      if (score >= 50) return '⚠ Could Be Faster'
+      return '✗ Slow Website'
     },
-    
-    getLCPColor(lcp) {
-      if (lcp <= 2.5) return 'text-green-600'
-      if (lcp <= 4) return 'text-yellow-600'
-      return 'text-red-600'
+    getScoreExplanation(score) {
+      if (score >= 90) return 'Your site loads quickly - customers will be happy!'
+      if (score >= 50) return 'Your site is okay but losing some customers due to speed'
+      return 'Your site is too slow - customers are leaving before it loads'
     },
-    
-    getLCPBarColor(lcp) {
-      if (lcp <= 2.5) return 'bg-green-500'
-      if (lcp <= 4) return 'bg-yellow-500'
-      return 'bg-red-500'
-    },
-    
-    getLCPPercentage(lcp) {
-      // Convert LCP seconds to percentage (inverse relationship)
-      return Math.max(10, 100 - (lcp * 15))
-    },
-    
-    getLCPBadge(lcp) {
-      if (lcp <= 2.5) return 'bg-green-100 text-green-800'
-      if (lcp <= 4) return 'bg-yellow-100 text-yellow-800'
-      return 'bg-red-100 text-red-800'
-    },
-    
-    getCLSColor(cls) {
-      if (cls <= 0.1) return 'text-green-600'
-      if (cls <= 0.25) return 'text-yellow-600'
-      return 'text-red-600'
-    },
-    
-    getCLSBadge(cls) {
-      if (cls <= 0.1) return 'bg-green-100 text-green-800'
-      if (cls <= 0.25) return 'bg-yellow-100 text-yellow-800'
-      return 'bg-red-100 text-red-800'
+    calculateSpeedLoss() {
+      // Estimate revenue loss from slow speed
+      const baseRevenue = 5000
+      if (this.metrics.performance < 50) {
+        return Math.round(baseRevenue * 0.4).toLocaleString()
+      }
+      if (this.metrics.performance < 70) {
+        return Math.round(baseRevenue * 0.2).toLocaleString()
+      }
+      return '0'
     }
-  },
-  
-  mounted() {
-    this.criticalIssues = this.criticalIssuesComputed
   }
 }
 </script>
@@ -337,8 +221,7 @@ export default {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Progress bar animation */
-.progress-bar {
-  transition: width 1.5s ease-out;
+.progress-circle {
+  transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>

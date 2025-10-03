@@ -52,45 +52,6 @@
       </div>
     </div>
     
-    <!-- SEO Summary Stats -->
-    <div class="mt-8 pt-6 border-t border-gray-200">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="text-center p-4 rounded-lg bg-green-50 border border-green-200">
-          <div class="text-2xl font-bold text-green-700">{{ passedChecks }}</div>
-          <div class="text-sm text-green-600">Passing Checks</div>
-        </div>
-        <div class="text-center p-4 rounded-lg bg-red-50 border border-red-200">
-          <div class="text-2xl font-bold text-red-700">{{ failedChecks }}</div>
-          <div class="text-sm text-red-600">Issues Found</div>
-        </div>
-        <div class="text-center p-4 rounded-lg bg-blue-50 border border-blue-200">
-          <div class="text-2xl font-bold text-blue-700">{{ seoScore }}%</div>
-          <div class="text-sm text-blue-600">SEO Score</div>
-        </div>
-        <div class="text-center p-4 rounded-lg bg-purple-50 border border-purple-200">
-          <div class="text-2xl font-bold text-purple-700">{{ highPriorityIssues }}</div>
-          <div class="text-sm text-purple-600">High Priority</div>
-        </div>
-      </div>
-      
-      <!-- Quick Wins Section -->
-      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 class="font-semibold text-yellow-800 mb-3 flex items-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          Quick Wins Available
-        </h3>
-        <div class="space-y-2">
-          <div v-for="win in quickWins" :key="win.type" class="flex items-center text-sm text-yellow-800">
-            <div class="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
-            <span>{{ win.message }}</span>
-            <span class="ml-auto text-xs bg-yellow-200 px-2 py-1 rounded">{{ win.effort }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
     <!-- Technical Details (Expandable) -->
     <div class="mt-6">
       <button 

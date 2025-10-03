@@ -51,6 +51,7 @@ const corsOptions = {
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
     process.env.FRONTEND_URL_ALT || 'http://127.0.0.1:5173',
+    'http://localhost:3002', // Vite dev server
     'http://localhost:5174', // Additional port for development
     'http://localhost:5175'  // Additional port for development
   ],

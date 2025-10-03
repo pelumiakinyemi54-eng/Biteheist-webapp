@@ -16,6 +16,7 @@
             <th class="text-center py-4 px-4 font-semibold text-gray-700">Reviews</th>
             <th class="text-center py-4 px-4 font-semibold text-gray-700">Distance</th>
             <th class="text-center py-4 px-4 font-semibold text-gray-700">Performance</th>
+            <th class="text-center py-4 px-4 font-semibold text-gray-700">Website</th>
           </tr>
         </thead>
         <tbody>
@@ -47,6 +48,20 @@
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                 Analyzing
               </span>
+            </td>
+            <td class="text-center py-4 px-4">
+              <a
+                v-if="restaurant.website"
+                :href="restaurant.website"
+                target="_blank"
+                class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 transition-colors"
+              >
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+                Visit
+              </a>
+              <span v-else class="text-xs text-gray-400">N/A</span>
             </td>
           </tr>
           
@@ -95,7 +110,7 @@
               </div>
             </td>
             <td class="text-center py-4 px-4">
-              <span 
+              <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 :class="getPerformanceClass(competitor)"
               >
@@ -105,28 +120,45 @@
                 ⚠️ Threat
               </div>
             </td>
+            <td class="text-center py-4 px-4">
+              <a
+                v-if="competitor.website"
+                :href="competitor.website"
+                target="_blank"
+                class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+              >
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+                Visit
+              </a>
+              <span v-else class="text-xs text-gray-400">N/A</span>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
     
-    <!-- Summary Stats -->
+    <!-- Revenue Gap Analysis -->
     <div class="mt-6 pt-6 border-t border-gray-200">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+        </svg>
+        Revenue Gap Analysis
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="text-center p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+          <div class="text-3xl font-bold text-green-700">${{ estimatedRevenueGap.toLocaleString() }}</div>
+          <div class="text-sm text-green-800 font-medium">Monthly Revenue Gap</div>
+          <div class="text-xs text-green-600 mt-1">If you matched top competitor</div>
+        </div>
         <div class="text-center p-4 rounded-lg bg-gray-50">
           <div class="text-2xl font-bold text-gray-800">{{ competitorStats.avgRating }}</div>
           <div class="text-sm text-gray-600">Avg Competitor Rating</div>
           <div class="text-xs" :class="restaurant.rating > competitorStats.avgRating ? 'text-green-600' : 'text-red-600'">
-            {{ restaurant.rating > competitorStats.avgRating ? '↑' : '↓' }} 
+            {{ restaurant.rating > competitorStats.avgRating ? '↑' : '↓' }}
             {{ Math.abs(restaurant.rating - competitorStats.avgRating).toFixed(1) }}
-          </div>
-        </div>
-        <div class="text-center p-4 rounded-lg bg-gray-50">
-          <div class="text-2xl font-bold text-gray-800">{{ competitorStats.avgReviews }}</div>
-          <div class="text-sm text-gray-600">Avg Reviews</div>
-          <div class="text-xs" :class="restaurant.total_ratings > competitorStats.avgReviews ? 'text-green-600' : 'text-red-600'">
-            {{ restaurant.total_ratings > competitorStats.avgReviews ? '↑' : '↓' }} 
-            {{ Math.abs(restaurant.total_ratings - competitorStats.avgReviews) }}
           </div>
         </div>
         <div class="text-center p-4 rounded-lg bg-gray-50">
@@ -135,7 +167,7 @@
           <div class="text-xs text-gray-500">Higher rated nearby</div>
         </div>
         <div class="text-center p-4 rounded-lg bg-gray-50">
-          <div class="text-2xl font-bold text-indigo-600">{{ marketPosition }}</div>
+          <div class="text-2xl font-bold text-indigo-600">#{{ marketPosition }}</div>
           <div class="text-sm text-gray-600">Market Position</div>
           <div class="text-xs text-gray-500">Out of {{ competitors.length + 1 }}</div>
         </div>
@@ -181,11 +213,25 @@ export default {
     competitorStats() {
       const validRatings = this.competitors.filter(c => c.rating).map(c => c.rating)
       const validReviews = this.competitors.filter(c => c.user_ratings_total).map(c => c.user_ratings_total)
-      
+
       return {
         avgRating: validRatings.length ? (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(1) : 0,
         avgReviews: validReviews.length ? Math.round(validReviews.reduce((a, b) => a + b, 0) / validReviews.length) : 0
       }
+    },
+
+    estimatedRevenueGap() {
+      // Find top competitor rating
+      const topRating = Math.max(...this.competitors.map(c => c.rating || 0))
+      const ratingGap = Math.max(0, topRating - (this.restaurant.rating || 0))
+
+      // Estimate revenue impact: each 0.1 star difference = ~2% revenue
+      // Assuming average restaurant revenue of $50k/month
+      const baseRevenue = 50000
+      const revenuePercentGap = ratingGap * 20 // 20% per full star
+      const revenueGap = Math.round(baseRevenue * (revenuePercentGap / 100))
+
+      return Math.min(revenueGap, 20000) // Cap at $20k for realism
     },
     
     threatsCount() {

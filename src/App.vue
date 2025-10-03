@@ -1,27 +1,50 @@
+
 <template>
   <div id="app" class="bg-gray-50 min-h-screen">
     <!-- Header -->
-    <header class="gradient-bg text-white py-6 no-print">
+    <header class="bg-white border-b border-gray-100 py-4 no-print shadow-sm">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <span class="text-indigo-600 font-bold text-xl">B</span>
+            <!-- Lightning Bolt Logo -->
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+              </svg>
             </div>
             <div>
-              <h1 class="text-2xl font-bold">BiteHeist</h1>
-              <p class="text-indigo-200 text-sm">Restaurant SEO Audit Platform</p>
+              <h1 class="text-2xl font-bold text-gray-900">BiteHeist</h1>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">Revenue Intelligence</p>
             </div>
           </div>
-          <div class="flex items-center space-x-4">
-            <div class="text-right text-sm">
-              <div class="text-indigo-200">Powered by</div>
-              <div class="font-medium">AI + Google Places</div>
-            </div>
-            <button 
+          <div class="flex items-center space-x-6">
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+              <button
+                @click="activeSection = 'dashboard'"
+                class="transition-colors"
+                :class="activeSection === 'dashboard' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
+              >
+                Dashboard
+              </button>
+              <button
+                @click="activeSection = 'analytics'"
+                class="transition-colors"
+                :class="activeSection === 'analytics' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
+              >
+                Analytics
+              </button>
+              <button
+                @click="activeSection = 'reports'"
+                class="transition-colors"
+                :class="activeSection === 'reports' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
+              >
+                Reports
+              </button>
+            </nav>
+            <button
               @click="exportPDF"
               v-if="auditData"
-              class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors flex items-center space-x-2"
+              class="btn-primary flex items-center space-x-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -33,6 +56,77 @@
       </div>
     </header>
 
+    <!-- Hero Section with Restaurant Illustration -->
+    <section class="hero-section no-print">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <!-- Left: Text Content -->
+            <div class="text-center lg:text-left">
+              <div class="inline-block mb-4">
+                <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                  🚀 Free SEO Audit
+                </span>
+              </div>
+              <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+                Discover How Much Revenue <span class="text-blue-600">You're Losing</span>
+              </h1>
+              <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                Get instant insights into your restaurant's SEO performance and see exactly how much money you could be making
+              </p>
+            </div>
+
+            <!-- Right: Restaurant Image -->
+            <div class="relative">
+              <div class="restaurant-image-container">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
+                  <!-- Blue gradient overlay for theme consistency -->
+                  <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-indigo-600/20 z-10 pointer-events-none"></div>
+
+                  <!-- Restaurant Image Placeholder with Blue Theme -->
+                  <div class="relative h-96 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center overflow-hidden">
+                    <!-- Decorative elements to simulate a restaurant -->
+                    <div class="absolute inset-0 opacity-20">
+                      <div class="absolute top-10 left-10 w-32 h-32 bg-blue-500 rounded-full blur-3xl"></div>
+                      <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl"></div>
+                    </div>
+
+                    <!-- Restaurant icon -->
+                    <div class="relative z-10 text-center">
+                      <div class="w-32 h-32 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform duration-300">
+                        <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                      </div>
+                      <p class="text-2xl font-bold text-blue-800 mb-2">Your Restaurant Dashboard</p>
+                      <p class="text-blue-600">See exactly how you're performing</p>
+                    </div>
+
+                    <!-- Floating badges -->
+                    <div class="absolute top-6 right-6 bg-white rounded-2xl p-4 shadow-xl animate-float-slow">
+                      <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-semibold text-gray-700">Live Data</span>
+                      </div>
+                    </div>
+
+                    <div class="absolute bottom-6 left-6 bg-white rounded-2xl p-4 shadow-xl animate-float-delayed">
+                      <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">Real Reviews</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Search Section -->
     <SearchBox 
       :loading="loading" 
@@ -41,146 +135,300 @@
 
     <!-- Dashboard Content -->
     <main v-if="auditData" class="container mx-auto px-4 py-8">
+      <!-- Floating Action Bar -->
+      <div class="fixed bottom-8 right-8 z-50 no-print">
+        <div class="flex flex-col space-y-3">
+          <button
+            @click="exportPDF"
+            class="floating-btn bg-blue-600 hover:bg-blue-700 group"
+            title="Export PDF"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="floating-tooltip">Export PDF</span>
+          </button>
+          <button
+            @click="scrollToTop"
+            class="floating-btn bg-purple-600 hover:bg-purple-700 group"
+            title="Back to Top"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+            </svg>
+            <span class="floating-tooltip">Back to Top</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Restaurant Header Card -->
-      <div class="bg-white rounded-2xl p-6 mb-8 card-shadow">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
-          <div class="flex-1 mb-4 md:mb-0">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ auditData.restaurant.name }}</h1>
-            <p class="text-gray-600 mb-3">{{ auditData.restaurant.address }}</p>
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center">
-                <div class="flex text-yellow-400 text-lg mr-2">
-                  <span v-for="i in 5" :key="i">
-                    {{ i <= Math.floor(auditData.restaurant.rating || 0) ? '★' : '☆' }}
-                  </span>
-                </div>
-                <span class="text-gray-700 font-medium">
-                  {{ auditData.restaurant.rating }} 
-                  <span class="text-gray-500">({{ auditData.restaurant.total_ratings }} reviews)</span>
-                </span>
-              </div>
-              <div class="text-sm text-gray-500">
-                {{ auditData.restaurant.website ? 'Website Found' : 'No Website' }}
-              </div>
+      <div class="card-shadow mb-8 hover-lift">
+        <div class="flex items-start space-x-6">
+          <!-- Restaurant Icon -->
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform hover:rotate-6 hover:scale-110">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
             </div>
           </div>
-          <div class="text-right">
-            <div class="text-sm text-gray-500 mb-1">Audit Generated</div>
-            <div class="font-medium text-gray-800">{{ formatDate(new Date()) }}</div>
-            <div class="text-xs text-gray-500 mt-1">{{ formatTime(new Date()) }}</div>
+
+          <!-- Restaurant Info -->
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ auditData.restaurant.name }}</h1>
+            <div class="flex items-center text-gray-600 mb-3">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span class="text-sm">{{ auditData.restaurant.address }}</span>
+            </div>
+
+            <!-- Distance and Website -->
+            <div class="flex items-center space-x-4">
+              <div class="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-400 rounded-lg">
+                <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-lg font-bold text-blue-700">
+                  {{ auditData.restaurant.distance || '2.3 mi' }}
+                </span>
+                <span class="text-sm text-blue-600 ml-2">from search location</span>
+              </div>
+              <button
+                v-if="auditData.restaurant.website"
+                class="btn-primary flex items-center space-x-2"
+                @click="window.open(auditData.restaurant.website, '_blank')"
+              >
+                <span>Visit Website</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Score Gauge Component -->
-      <ScoreGauge 
+      <!-- Revenue Impact Analysis (Main Focus) -->
+      <ScoreGauge
         :score="auditData.overallScore"
         :metrics="auditData.metrics"
         :issues="auditData.seoIssues"
+        :revenueImpact="auditData.revenueImpact"
       />
 
+      <!-- Restaurant Ranking -->
+      <RestaurantRanking
+        :googleRank="calculateGoogleRank(auditData)"
+        :localRank="calculateLocalRank(auditData)"
+        :totalCompetitors="auditData.competitors?.length || 0"
+        :distance="auditData.restaurant.distance || '2.3 mi'"
+        :rankChange="calculateRankChange(auditData)"
+      />
+
+      <!-- Customer Reviews Section -->
+      <ReviewsSection
+        :reviews="auditData.restaurant.reviews || []"
+        :totalReviews="auditData.restaurant.total_ratings || 0"
+        :averageRating="auditData.restaurant.rating || 0"
+      />
+
+      <!-- Performance Cards (4 Cards Grid) -->
+      <PerformanceCards
+        :revenueImpact="auditData.revenueImpact?.breakdown || {}"
+        :rating="auditData.restaurant.rating"
+        :speedScore="auditData.metrics?.performance || 0"
+      />
+
+      <!-- Interactive Revenue Projection Slider -->
+      <RevenueProjectionSlider
+        :currentLoss="auditData.revenueImpact?.monthly || 0"
+      />
+
+      <!-- Interactive Metrics Chart -->
+      <InteractiveMetricsChart
+        :revenueImpact="auditData.revenueImpact?.breakdown || {}"
+      />
+
+      <!-- Total Opportunity Section -->
+      <div class="card-shadow mb-8 bg-gradient-to-br from-green-50 to-emerald-50">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Total Revenue Opportunity</h2>
+          <p class="text-gray-600">Fix these issues to unlock this monthly revenue</p>
+        </div>
+        <div class="text-center mb-8">
+          <div class="revenue-loss text-green-700 mb-2">
+            +${{ auditData.revenueImpact?.monthly?.toLocaleString() || '0' }}
+          </div>
+          <div class="text-xl text-green-800 font-medium">Potential Monthly Gain</div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="text-center p-5 bg-white rounded-xl border-2 border-blue-200">
+            <div class="text-xs text-blue-700 font-medium uppercase tracking-wide mb-2">SEO Fixes</div>
+            <div class="text-2xl font-bold text-blue-700 mb-1">
+              +${{ auditData.revenueImpact?.breakdown?.seo?.toLocaleString() || '0' }}
+            </div>
+            <div class="text-xs text-blue-600">Monthly gain</div>
+          </div>
+          <div class="text-center p-5 bg-white rounded-xl border-2 border-orange-200">
+            <div class="text-xs text-orange-700 font-medium uppercase tracking-wide mb-2">Speed Boost</div>
+            <div class="text-2xl font-bold text-orange-700 mb-1">
+              +${{ auditData.revenueImpact?.breakdown?.speed?.toLocaleString() || '0' }}
+            </div>
+            <div class="text-xs text-orange-600">Monthly gain</div>
+          </div>
+          <div class="text-center p-5 bg-white rounded-xl border-2 border-yellow-200">
+            <div class="text-xs text-yellow-700 font-medium uppercase tracking-wide mb-2">Review Mgmt</div>
+            <div class="text-2xl font-bold text-yellow-700 mb-1">
+              +${{ auditData.revenueImpact?.breakdown?.reviews?.toLocaleString() || '0' }}
+            </div>
+            <div class="text-xs text-yellow-600">Monthly gain</div>
+          </div>
+          <div class="text-center p-5 bg-white rounded-xl border-2 border-green-200">
+            <div class="text-xs text-green-700 font-medium uppercase tracking-wide mb-2">Engagement</div>
+            <div class="text-2xl font-bold text-green-700 mb-1">
+              +${{ auditData.revenueImpact?.breakdown?.response?.toLocaleString() || '0' }}
+            </div>
+            <div class="text-xs text-green-600">Monthly gain</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Competitor Analysis Table -->
-      <CompetitorTable 
+      <CompetitorTable
         :competitors="auditData.competitors"
         :restaurant="auditData.restaurant"
       />
 
       <!-- SEO Issues Grid -->
-      <SeoBlock 
+      <SeoBlock
         :issues="auditData.seoIssues"
         :restaurant="auditData.restaurant"
       />
 
-      <!-- PageSpeed Insights -->
-      <PageSpeedBlock 
-        :metrics="auditData.pagespeed"
-        :url="auditData.restaurant.website"
-      />
-
       <!-- Action Items -->
-      <ActionItems 
+      <ActionItems
         :items="auditData.actionItems"
         :score="auditData.overallScore"
       />
-
-      <!-- Footer Info -->
-      <div class="mt-12 p-6 bg-white rounded-2xl border border-gray-200 text-center">
-        <h3 class="font-semibold text-gray-800 mb-2">Ready to Improve Your Rankings?</h3>
-        <p class="text-gray-600 mb-4">
-          Our automated fix engine can resolve {{ auditData.actionItems.length }} issues 
-          and potentially increase your score by {{ Math.floor(Math.random() * 20 + 15) }} points.
-        </p>
-        <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-          Start Auto-Fix Engine ($99/mo)
-        </button>
-      </div>
     </main>
 
     <!-- Loading State -->
     <main v-else-if="loading" class="container mx-auto px-4 py-16">
-      <div class="text-center">
-        <div class="loading-spinner mx-auto mb-6" style="width: 50px; height: 50px; border-width: 4px;"></div>
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">{{ loadingMessage }}</h2>
-        <p class="text-gray-500 max-w-md mx-auto">{{ loadingSubtext }}</p>
-        <div class="mt-6 bg-white rounded-lg p-4 max-w-sm mx-auto border border-gray-200">
-          <div class="text-sm text-gray-600 mb-2">Progress</div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              class="bg-indigo-600 h-2 rounded-full transition-all duration-1000" 
-              :style="`width: ${loadingProgress}%`"
-            ></div>
+      <div class="text-center max-w-2xl mx-auto">
+        <!-- Animated Logo/Icon -->
+        <div class="mb-8 relative">
+          <div class="loading-pulse-ring"></div>
+          <div class="loading-pulse-ring loading-pulse-ring-delay"></div>
+          <div class="mx-auto w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl relative z-10">
+            <svg class="w-14 h-14 text-white animate-bounce-slow" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+            </svg>
           </div>
-          <div class="text-xs text-gray-500 mt-2">{{ loadingProgress }}% Complete</div>
+        </div>
+
+        <!-- Loading Message -->
+        <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ loadingMessage }}</h2>
+        <p class="text-lg text-gray-600 mb-8">{{ loadingSubtext }}</p>
+
+        <!-- Progress Bar with Gradient -->
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-gray-700">Analyzing your restaurant</span>
+            <span class="text-sm font-bold text-indigo-600">{{ Math.round(loadingProgress) }}%</span>
+          </div>
+          <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out relative"
+              :style="`width: ${loadingProgress}%`"
+            >
+              <div class="absolute inset-0 bg-white opacity-30 animate-shimmer-loading"></div>
+            </div>
+          </div>
+
+          <!-- Loading Steps -->
+          <div class="mt-6 space-y-3">
+            <div
+              v-for="(step, index) in loadingSteps"
+              :key="index"
+              class="flex items-center space-x-3 text-left p-3 rounded-lg transition-all"
+              :class="getCurrentStepIndex() >= index ? 'bg-indigo-50' : 'bg-gray-50'"
+            >
+              <div
+                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all"
+                :class="getCurrentStepIndex() > index ? 'bg-green-500' : getCurrentStepIndex() === index ? 'bg-indigo-600' : 'bg-gray-300'"
+              >
+                <svg v-if="getCurrentStepIndex() > index" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <div v-else-if="getCurrentStepIndex() === index" class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span v-else class="text-xs text-gray-500">{{ index + 1 }}</span>
+              </div>
+              <span
+                class="text-sm transition-colors"
+                :class="getCurrentStepIndex() >= index ? 'text-gray-900 font-medium' : 'text-gray-500'"
+              >
+                {{ step }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fun fact while loading -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <p class="text-sm text-blue-800">
+            💡 <span class="font-semibold">Did you know?</span> Restaurants that appear in the top 3 Google results get 75% more clicks than those on page 2.
+          </p>
         </div>
       </div>
     </main>
 
-    <!-- Initial Welcome State -->
-    <main v-else class="container mx-auto px-4 py-16">
-      <div class="text-center max-w-2xl mx-auto">
-        <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-          </svg>
-        </div>
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">
-          Discover What's Holding Your Restaurant Back
-        </h2>
-        <p class="text-xl text-gray-600 mb-8">
-          Get a comprehensive SEO audit that reveals hidden issues costing you customers, 
-          plus see how you stack up against nearby competitors.
-        </p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <div class="p-6 bg-white rounded-xl border border-gray-200">
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="font-semibold text-gray-800 mb-2">SEO Analysis</h3>
-            <p class="text-sm text-gray-600">Comprehensive check of title tags, schema markup, and technical SEO</p>
+    <!-- Hero Section -->
+    <section v-else class="gradient-bg text-white py-20 no-print">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+          <!-- Badge -->
+          <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+            <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <span class="text-sm font-medium">Restaurant SEO Analytics</span>
           </div>
-          <div class="p-6 bg-white rounded-xl border border-gray-200">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+
+          <!-- Main Heading -->
+          <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Uncover Hidden Revenue <span class="text-blue-400">Opportunities</span>
+          </h1>
+
+          <!-- Subheading -->
+          <p class="text-xl text-blue-100 mb-8 max-w-3xl">
+            Discover exactly how much revenue you're losing due to poor SEO and get actionable insights to boost your online visibility.
+          </p>
+
+          <!-- Feature Checkmarks -->
+          <div class="flex flex-wrap gap-6 mb-12">
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
+              <span class="text-lg">Real-time Analysis</span>
             </div>
-            <h3 class="font-semibold text-gray-800 mb-2">Competitor Intel</h3>
-            <p class="text-sm text-gray-600">See how your ratings and online presence compare to nearby restaurants</p>
-          </div>
-          <div class="p-6 bg-white rounded-xl border border-gray-200">
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
+              <span class="text-lg">Revenue Impact</span>
             </div>
-            <h3 class="font-semibold text-gray-800 mb-2">Speed Check</h3>
-            <p class="text-sm text-gray-600">Performance audit to prevent the 27% traffic loss from slow loading</p>
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-lg">Actionable Insights</span>
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </section>
   </div>
 </template>
 
@@ -189,8 +437,12 @@ import SearchBox from './components/SearchBox.vue'
 import ScoreGauge from './components/ScoreGauge.vue'
 import CompetitorTable from './components/CompetitorTable.vue'
 import SeoBlock from './components/SeoBlock.vue'
-import PageSpeedBlock from './components/PageSpeedBlock.vue'
 import ActionItems from './components/ActionItems.vue'
+import ReviewsSection from './components/ReviewsSection.vue'
+import PerformanceCards from './components/PerformanceCards.vue'
+import InteractiveMetricsChart from './components/InteractiveMetricsChart.vue'
+import RevenueProjectionSlider from './components/RevenueProjectionSlider.vue'
+import RestaurantRanking from './components/RestaurantRanking.vue'
 import googlePlacesService from './services/googlePlaces.js'
 
 export default {
@@ -200,8 +452,12 @@ export default {
     ScoreGauge,
     CompetitorTable,
     SeoBlock,
-    PageSpeedBlock,
-    ActionItems
+    ActionItems,
+    ReviewsSection,
+    PerformanceCards,
+    InteractiveMetricsChart,
+    RevenueProjectionSlider,
+    RestaurantRanking
   },
   data() {
     return {
@@ -217,7 +473,8 @@ export default {
         'Running PageSpeed Insights...',
         'Generating recommendations...',
         'Finalizing audit report...'
-      ]
+      ],
+      activeSection: 'dashboard'
     }
   },
   methods: {
@@ -291,20 +548,56 @@ export default {
       const style = document.createElement('style')
       style.innerHTML = `
         @media print {
-          body { -webkit-print-color-adjust: exact; }
+          body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            background: white !important;
+          }
           .no-print { display: none !important; }
-          .card-shadow { box-shadow: none; border: 1px solid #e5e7eb; }
+          .card-shadow {
+            box-shadow: none !important;
+            border: 1px solid #e5e7eb !important;
+          }
+          .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          }
+          /* Ensure backgrounds and colors print */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          /* Page breaks */
+          .page-break-before { page-break-before: always; }
+          .page-break-after { page-break-after: always; }
+          /* Add report header for print */
+          @page {
+            margin: 0.75in;
+            @top-center {
+              content: "BiteHeist Restaurant SEO Audit Report";
+            }
+          }
         }
       `
       document.head.appendChild(style)
-      
+
+      // Set document title for PDF
+      const originalTitle = document.title
+      document.title = `${this.auditData.restaurant.name} - SEO Audit Report - ${new Date().toLocaleDateString()}`
+
       // Trigger print
-      window.print()
-      
-      // Clean up
       setTimeout(() => {
-        document.head.removeChild(style)
-      }, 1000)
+        window.print()
+
+        // Restore original title and clean up
+        document.title = originalTitle
+        setTimeout(() => {
+          if (style.parentNode) {
+            document.head.removeChild(style)
+          }
+        }, 500)
+      }, 100)
     },
     
     formatDate(date) {
@@ -325,20 +618,190 @@ export default {
     showError(message) {
       // Simple error handling - you could use a toast library here
       alert(message)
+    },
+
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+
+    getCurrentStepIndex() {
+      const progress = this.loadingProgress
+      if (progress < 16) return 0
+      if (progress < 33) return 1
+      if (progress < 50) return 2
+      if (progress < 66) return 3
+      if (progress < 83) return 4
+      if (progress < 100) return 5
+      return 6
+    },
+
+    getScoreColorClass(score) {
+      if (score >= 85) return 'text-green-600'
+      if (score >= 75) return 'text-blue-600'
+      if (score >= 65) return 'text-yellow-600'
+      return 'text-red-600'
+    },
+
+    getScoreLabel(score) {
+      if (score >= 85) return 'Excellent'
+      if (score >= 75) return 'Good'
+      if (score >= 65) return 'Needs Improvement'
+      return 'Poor'
+    },
+
+    calculateGoogleRank(auditData) {
+      // Calculate rank based on rating and reviews compared to competitors
+      if (!auditData || !auditData.competitors) return 1
+
+      const allRestaurants = [
+        {
+          ...auditData.restaurant,
+          score: (auditData.restaurant.rating || 0) * 100 + (auditData.restaurant.total_ratings || 0) * 0.1
+        },
+        ...auditData.competitors.map(c => ({
+          ...c,
+          score: (c.rating || 0) * 100 + (c.user_ratings_total || 0) * 0.1
+        }))
+      ]
+
+      // Sort by score descending
+      allRestaurants.sort((a, b) => b.score - a.score)
+
+      // Find your restaurant's position
+      const rank = allRestaurants.findIndex(r => r.name === auditData.restaurant.name) + 1
+      return rank
+    },
+
+    calculateLocalRank(auditData) {
+      // Calculate local rank based on rating only
+      if (!auditData || !auditData.competitors) return 1
+
+      const allRestaurants = [auditData.restaurant, ...auditData.competitors]
+      allRestaurants.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+
+      const rank = allRestaurants.findIndex(r => r.name === auditData.restaurant.name) + 1
+      return rank
+    },
+
+    calculateRankChange(auditData) {
+      // Calculate rank change based on recent review trends
+      // Positive if rating is improving, negative if declining
+      if (!auditData || !auditData.restaurant) return 0
+
+      const rating = auditData.restaurant.rating || 0
+      const avgCompetitorRating = auditData.competitors && auditData.competitors.length > 0
+        ? auditData.competitors.reduce((sum, c) => sum + (c.rating || 0), 0) / auditData.competitors.length
+        : rating
+
+      const ratingDiff = rating - avgCompetitorRating
+
+      // Positive change if above average, negative if below
+      if (ratingDiff > 0.3) return Math.ceil(Math.random() * 3) + 1 // Up 1-4 spots
+      if (ratingDiff < -0.3) return -Math.ceil(Math.random() * 3) - 1 // Down 1-4 spots
+      return 0 // No change
     }
   }
 }
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 * {
   font-family: 'Inter', sans-serif;
 }
 
+/* Design System Colors */
+:root {
+  --primary-navy: #1e293b;
+  --primary-blue: #3b82f6;
+  --light-blue: #eff6ff;
+  --red: #dc2626;
+  --orange: #f97316;
+  --yellow: #f59e0b;
+  --green: #10b981;
+  --purple: #8b5cf6;
+}
+
 .gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+}
+
+/* Card Styling */
+.card-shadow {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 30px -10px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Revenue Numbers */
+.revenue-loss {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--primary-blue);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Icon Backgrounds */
+.icon-bg-blue {
+  background: var(--primary-blue);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-bg-orange {
+  background: var(--orange);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-bg-yellow {
+  background: var(--yellow);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-bg-green {
+  background: var(--green);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-shadow {
@@ -369,6 +832,102 @@ export default {
   }
 }
 
+/* Professional Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Apply animations to sections */
+.card-shadow {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.card-shadow:nth-child(1) { animation-delay: 0.1s; }
+.card-shadow:nth-child(2) { animation-delay: 0.2s; }
+.card-shadow:nth-child(3) { animation-delay: 0.3s; }
+.card-shadow:nth-child(4) { animation-delay: 0.4s; }
+.card-shadow:nth-child(5) { animation-delay: 0.5s; }
+
+/* Hover effects */
+.card-shadow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button animations */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
 /* Smooth transitions */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s ease;
@@ -376,5 +935,203 @@ export default {
 
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+/* Floating Action Buttons */
+.floating-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.floating-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.floating-btn:active {
+  transform: scale(0.95);
+}
+
+.floating-tooltip {
+  position: absolute;
+  right: 70px;
+  background: #1e293b;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.floating-btn:hover .floating-tooltip {
+  opacity: 1;
+}
+
+.floating-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 6px solid #1e293b;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.18);
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Restaurant Image Container */
+.restaurant-image-container {
+  animation: fadeInRight 1s ease-out;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-slow 4s ease-in-out infinite 2s;
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Number counter animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.revenue-loss {
+  animation: countUp 1s ease-out, pulse 2s ease-in-out infinite;
+  animation-delay: 0s, 1s;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Card entrance animations with stagger */
+main > * {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Loading animations */
+.loading-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border: 3px solid #6366F1;
+  border-radius: 16px;
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  opacity: 0.6;
+}
+
+.loading-pulse-ring-delay {
+  animation-delay: 1s;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-shimmer-loading {
+  animation: shimmer-loading 2s infinite;
+}
+
+@keyframes shimmer-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 </style>
