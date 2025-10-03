@@ -191,7 +191,7 @@ import CompetitorTable from './components/CompetitorTable.vue'
 import SeoBlock from './components/SeoBlock.vue'
 import PageSpeedBlock from './components/PageSpeedBlock.vue'
 import ActionItems from './components/ActionItems.vue'
-import { generateMockAuditData } from './utils/mockData.js'
+import googlePlacesService from './services/googlePlaces.js'
 
 export default {
   name: 'App',
@@ -223,14 +223,20 @@ export default {
   methods: {
     async handleRunAudit(place) {
       if (!place) return
-      
+
       this.loading = true
       this.loadingProgress = 0
       this.auditData = null
-      
+
       try {
-        await this.simulateAuditProcess(place)
-        this.auditData = generateMockAuditData(place)
+        // Start progress animation
+        const progressPromise = this.simulateAuditProcess(place)
+
+        // Get real data from backend API
+        const auditResult = await googlePlacesService.auditRestaurant(place.place_id)
+
+        await progressPromise // Wait for progress to finish
+        this.auditData = auditResult
       } catch (error) {
         console.error('Audit error:', error)
         this.showError('Failed to complete audit. Please try again.')
