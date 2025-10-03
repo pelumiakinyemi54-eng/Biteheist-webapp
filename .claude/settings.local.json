@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start)",
+      "Bash(taskkill:*)",
+      "Bash(timeout:*)",
+      "Bash(curl \"http://localhost:3004/api/restaurants/search?query=pizza&limit=2\")",
+      "Bash(PORT=3004 npm start)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
