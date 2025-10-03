@@ -3,13 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const session = require('express-session');
-const passport = require('./config/passport');
 const winston = require('winston');
 const { connectDB } = require('./config/database');
 
 // Import routes
-const authRoutes = require('./routes/auth');
 const restaurantRoutes = require('./routes/restaurants');
 
 // Initialize Express app
@@ -64,22 +61,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Session middleware for passport
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: NODE_ENV === 'production', // Only use secure cookies in production
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
-
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -114,7 +95,6 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // API Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 
 // Health check endpoint
