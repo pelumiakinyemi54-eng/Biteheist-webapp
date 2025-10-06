@@ -1,0 +1,57 @@
+services:
+  # Backend API Service
+  - type: web
+    name: biteheist-backend
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: API_VERSION
+        value: v1
+      - key: MONGODB_URI
+        sync: false
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_REQUESTS_PER_HOUR
+        value: 1000
+      - key: REQUEST_TIMEOUT
+        value: 10000
+      - key: DEFAULT_AOV
+        value: 28
+      - key: DEFAULT_CONVERSION_RATE
+        value: 0.03
+      - key: DEFAULT_MONTHLY_VISITORS
+        value: 1000
+      - key: LOG_LEVEL
+        value: info
+      - key: FRONTEND_URL
+        value: https://biteheist-dashboard.onrender.com
+    healthCheckPath: /health
+
+  # Frontend Static Site
+  - type: web
+    name: biteheist-dashboard
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://biteheist-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
