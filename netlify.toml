@@ -1,11 +1,28 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
 
-# Redirect all routes to index.html for Vue Router
+# Serverless functions configuration
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["backend/**"]
+
+# Redirect API calls to serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/api/health"
+  status = 200
+
+# Redirect all other routes to index.html for Vue Router (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"

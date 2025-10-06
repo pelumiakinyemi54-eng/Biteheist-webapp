@@ -1,8 +1,41 @@
 # Deployment Guide for BiteHeist Dashboard
 
-## Quick Deploy Instructions
+## 🆓 FREE Deployment Options
 
-### Frontend (Netlify)
+### Option 1: Vercel (Completely Free - RECOMMENDED)
+
+**Frontend:**
+1. Go to https://vercel.com/
+2. Sign up with GitHub
+3. Click "Add New" → "Project"
+4. Import your repository
+5. Configure:
+   - **Framework Preset:** Vite
+   - **Root Directory:** `./` (leave empty)
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+6. Add Environment Variables:
+   - `VITE_GOOGLE_PLACES_API_KEY` = `AIzaSyA3UsJjKOYzJZS9ARer6lzUPU_LOrAAABY`
+   - `VITE_API_BASE_URL` = (will add after backend is deployed)
+7. Click "Deploy"
+
+**Backend:**
+1. Create new project on Vercel
+2. Import same repository again
+3. Configure:
+   - **Root Directory:** `backend`
+   - **Build Command:** `npm install`
+4. Add Environment Variables:
+   - `NODE_ENV` = `production`
+   - `GOOGLE_PLACES_API_KEY` = `AIzaSyA3UsJjKOYzJZS9ARer6lzUPU_LOrAAABY`
+   - `FRONTEND_URL` = (your frontend URL from step 1)
+5. Deploy
+6. Copy backend URL and update frontend's `VITE_API_BASE_URL`
+7. Redeploy frontend
+
+### Option 2: Netlify + Railway (Both Free)
+
+**Frontend (Netlify - Free):**
 
 1. **Go to Netlify:** https://app.netlify.com/
 2. Click "Add new site" → "Import an existing project"
