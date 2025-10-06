@@ -17,7 +17,8 @@
               <p class="text-xs text-gray-500 uppercase tracking-wider">Revenue Intelligence</p>
             </div>
           </div>
-          <div class="flex items-center space-x-6">
+          <div class="flex items-center space-x-4">
+            <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
               <button
                 @click="activeSection = 'dashboard'"
@@ -27,11 +28,11 @@
                 Dashboard
               </button>
               <button
-                @click="activeSection = 'analytics'"
+                @click="activeSection = 'multi-restaurant'"
                 class="transition-colors"
-                :class="activeSection === 'analytics' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
+                :class="activeSection === 'multi-restaurant' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
               >
-                Analytics
+                Multi-Restaurant
               </button>
               <button
                 @click="activeSection = 'reports'"
@@ -41,10 +42,82 @@
                 Reports
               </button>
             </nav>
+
+            <!-- New Search Button (when audit data is shown) -->
+            <button
+              @click="resetAudit"
+              v-if="auditData"
+              class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span>New Search</span>
+            </button>
+
+            <!-- Export PDF Button -->
             <button
               @click="exportPDF"
               v-if="auditData"
-              class="btn-primary flex items-center space-x-2"
+              class="hidden md:flex items-center space-x-2 btn-primary"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>Export PDF</span>
+            </button>
+
+            <!-- Mobile Menu Button -->
+            <button
+              @click="mobileMenuOpen = !mobileMenuOpen"
+              class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div v-if="mobileMenuOpen" class="md:hidden mt-4 pb-4 border-t border-gray-100 pt-4">
+          <div class="flex flex-col space-y-2">
+            <button
+              @click="activeSection = 'dashboard'; mobileMenuOpen = false"
+              class="text-left px-4 py-3 rounded-lg transition-colors text-sm font-medium"
+              :class="activeSection === 'dashboard' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
+            >
+              Dashboard
+            </button>
+            <button
+              @click="activeSection = 'multi-restaurant'; mobileMenuOpen = false"
+              class="text-left px-4 py-3 rounded-lg transition-colors text-sm font-medium"
+              :class="activeSection === 'multi-restaurant' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
+            >
+              Multi-Restaurant
+            </button>
+            <button
+              @click="activeSection = 'reports'; mobileMenuOpen = false"
+              class="text-left px-4 py-3 rounded-lg transition-colors text-sm font-medium"
+              :class="activeSection === 'reports' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'"
+            >
+              Reports
+            </button>
+            <button
+              v-if="auditData"
+              @click="resetAudit; mobileMenuOpen = false"
+              class="text-left px-4 py-3 rounded-lg transition-colors text-sm font-medium text-gray-600 hover:bg-gray-50 flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span>New Search</span>
+            </button>
+            <button
+              v-if="auditData"
+              @click="exportPDF; mobileMenuOpen = false"
+              class="text-left px-4 py-3 rounded-lg transition-colors text-sm font-medium bg-blue-600 text-white flex items-center space-x-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -57,7 +130,7 @@
     </header>
 
     <!-- Hero Section with Restaurant Illustration -->
-    <section class="hero-section no-print">
+    <section v-if="activeSection === 'dashboard' && !auditData" class="hero-section no-print">
       <div class="container mx-auto px-4 py-12">
         <div class="max-w-6xl mx-auto">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -128,13 +201,24 @@
     </section>
 
     <!-- Search Section -->
-    <SearchBox 
-      :loading="loading" 
+    <SearchBox
+      v-if="activeSection === 'dashboard'"
+      :loading="loading"
       @run-audit="handleRunAudit"
     />
 
+    <!-- Multi-Restaurant Dashboard -->
+    <main v-if="activeSection === 'multi-restaurant'" class="container mx-auto px-4 py-8">
+      <NewMultiRestaurant />
+    </main>
+
+    <!-- Reports Section -->
+    <main v-else-if="activeSection === 'reports'" class="container mx-auto px-4 py-8">
+      <ReportsSection />
+    </main>
+
     <!-- Dashboard Content -->
-    <main v-if="auditData" class="container mx-auto px-4 py-8">
+    <main v-else-if="auditData && activeSection === 'dashboard'" class="container mx-auto px-4 py-8">
       <!-- Floating Action Bar -->
       <div class="fixed bottom-8 right-8 z-50 no-print">
         <div class="flex flex-col space-y-3">
@@ -296,6 +380,33 @@
         </div>
       </div>
 
+      <!-- Weekly Performance Report -->
+      <WeeklyReportView
+        v-if="auditData.restaurant && auditData.restaurant.placeId"
+        :placeId="auditData.restaurant.placeId"
+      />
+
+      <!-- Historical Ranking Tracking -->
+      <RankingHistory
+        v-if="auditData.restaurant && auditData.restaurant.placeId"
+        :placeId="auditData.restaurant.placeId"
+        :currentRank="auditData.ranking?.googleRank"
+        :currentScore="auditData.scores?.overall"
+      />
+
+      <!-- Traffic Correlation Analytics -->
+      <TrafficAnalytics
+        v-if="auditData.restaurant && auditData.restaurant.placeId"
+        :placeId="auditData.restaurant.placeId"
+        :currentRating="auditData.restaurant.rating"
+      />
+
+      <!-- Competitor Position Monitoring -->
+      <CompetitorMonitoring
+        v-if="auditData.restaurant && auditData.restaurant.placeId"
+        :placeId="auditData.restaurant.placeId"
+      />
+
       <!-- Competitor Analysis Table -->
       <CompetitorTable
         :competitors="auditData.competitors"
@@ -443,6 +554,12 @@ import PerformanceCards from './components/PerformanceCards.vue'
 import InteractiveMetricsChart from './components/InteractiveMetricsChart.vue'
 import RevenueProjectionSlider from './components/RevenueProjectionSlider.vue'
 import RestaurantRanking from './components/RestaurantRanking.vue'
+import RankingHistory from './components/RankingHistory.vue'
+import CompetitorMonitoring from './components/CompetitorMonitoring.vue'
+import TrafficAnalytics from './components/TrafficAnalytics.vue'
+import WeeklyReportView from './components/WeeklyReportView.vue'
+import NewMultiRestaurant from './components/NewMultiRestaurant.vue'
+import ReportsSection from './components/ReportsSection.vue'
 import googlePlacesService from './services/googlePlaces.js'
 
 export default {
@@ -457,7 +574,13 @@ export default {
     PerformanceCards,
     InteractiveMetricsChart,
     RevenueProjectionSlider,
-    RestaurantRanking
+    RestaurantRanking,
+    RankingHistory,
+    CompetitorMonitoring,
+    TrafficAnalytics,
+    WeeklyReportView,
+    NewMultiRestaurant,
+    ReportsSection
   },
   data() {
     return {
@@ -474,7 +597,8 @@ export default {
         'Generating recommendations...',
         'Finalizing audit report...'
       ],
-      activeSection: 'dashboard'
+      activeSection: 'dashboard',
+      mobileMenuOpen: false
     }
   },
   methods: {
@@ -699,6 +823,12 @@ export default {
       if (ratingDiff > 0.3) return Math.ceil(Math.random() * 3) + 1 // Up 1-4 spots
       if (ratingDiff < -0.3) return -Math.ceil(Math.random() * 3) - 1 // Down 1-4 spots
       return 0 // No change
+    },
+
+    resetAudit() {
+      this.auditData = null
+      this.mobileMenuOpen = false
+      this.activeSection = 'dashboard'
     }
   }
 }

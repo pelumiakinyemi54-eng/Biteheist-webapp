@@ -145,11 +145,11 @@ class GooglePlacesService {
   }
 
   /**
-   * Find nearby competitors
+   * Find nearby competitors (prioritizes food type similarity over distance)
    */
   async findNearbyCompetitors(lat, lng, options = {}) {
     try {
-      const { radius = 1000, maxResults = 5 } = options;
+      const { radius = 10000, maxResults = 5, restaurantTypes = [] } = options; // Get 5 competitors
 
       winston.info(`Finding competitors near ${lat}, ${lng}`);
 
@@ -157,7 +157,7 @@ class GooglePlacesService {
 
       const requestBody = {
         includedTypes: ['restaurant'],
-        maxResultCount: maxResults * 2, // Get extra to filter out the original restaurant
+        maxResultCount: 10, // Get 10 results to filter down to 5 best matches
         locationRestriction: {
           circle: {
             center: {
@@ -166,7 +166,8 @@ class GooglePlacesService {
             },
             radius: radius
           }
-        }
+        },
+        rankPreference: 'POPULARITY' // Rank by popularity, not just distance
       };
 
       const response = await this.makeRequest(url, {
@@ -183,8 +184,52 @@ class GooglePlacesService {
         return [];
       }
 
+      // Extract food-related types from the restaurant
+      const foodTypes = this.extractFoodTypes(restaurantTypes);
+
+      winston.info(`Restaurant food types: ${foodTypes.join(', ')}`);
+
+      // Score and rank competitors by food type similarity
+      let scoredPlaces = response.places.map(place => {
+        const competitorFoodTypes = this.extractFoodTypes(place.types || []);
+
+        // Calculate food type similarity score (0-100)
+        let similarityScore = 0;
+        if (foodTypes.length > 0 && competitorFoodTypes.length > 0) {
+          const matches = competitorFoodTypes.filter(type => foodTypes.includes(type));
+          const union = new Set([...foodTypes, ...competitorFoodTypes]);
+          similarityScore = (matches.length / union.size) * 100;
+        }
+
+        return {
+          place,
+          foodTypes: competitorFoodTypes,
+          similarityScore
+        };
+      });
+
+      // Filter: keep only restaurants with similar food types (>30% similarity)
+      // OR if no food types available, keep all
+      if (foodTypes.length > 0) {
+        scoredPlaces = scoredPlaces.filter(sp => sp.similarityScore > 30);
+        winston.info(`Filtered to ${scoredPlaces.length} restaurants with similar food type (>${30}% similarity)`);
+      }
+
+      // Sort by similarity score (highest first), then by rating
+      scoredPlaces.sort((a, b) => {
+        if (b.similarityScore !== a.similarityScore) {
+          return b.similarityScore - a.similarityScore;
+        }
+        return (b.place.rating || 0) - (a.place.rating || 0);
+      });
+
+      // Log top competitors
+      scoredPlaces.slice(0, maxResults).forEach(sp => {
+        winston.info(`✓ ${sp.place.displayName?.text}: ${Math.round(sp.similarityScore)}% similar (${sp.foodTypes.join(', ')})`);
+      });
+
       // Transform and calculate distances
-      return response.places.slice(0, maxResults).map(place => {
+      return scoredPlaces.slice(0, maxResults).map(({ place }) => {
         const distance = this.calculateDistance(
           lat, lng,
           place.location.latitude,
@@ -202,7 +247,8 @@ class GooglePlacesService {
           location: {
             lat: place.location.latitude,
             lng: place.location.longitude
-          }
+          },
+          types: place.types || []
         };
       });
 
@@ -211,6 +257,59 @@ class GooglePlacesService {
       // Return empty array for competitors as it's not critical
       return [];
     }
+  }
+
+  /**
+   * Extract food-related types from Google Places types array
+   * This filters out generic types and focuses on cuisine/food categories
+   */
+  extractFoodTypes(types) {
+    if (!types || !Array.isArray(types)) return [];
+
+    // Common food-specific types to look for
+    const foodTypePatterns = [
+      'american_restaurant',
+      'bakery',
+      'bar',
+      'barbecue_restaurant',
+      'brazilian_restaurant',
+      'breakfast_restaurant',
+      'brunch_restaurant',
+      'cafe',
+      'chinese_restaurant',
+      'coffee_shop',
+      'fast_food_restaurant',
+      'french_restaurant',
+      'greek_restaurant',
+      'hamburger_restaurant',
+      'ice_cream_shop',
+      'indian_restaurant',
+      'indonesian_restaurant',
+      'italian_restaurant',
+      'japanese_restaurant',
+      'korean_restaurant',
+      'lebanese_restaurant',
+      'meal_delivery',
+      'meal_takeaway',
+      'mediterranean_restaurant',
+      'mexican_restaurant',
+      'middle_eastern_restaurant',
+      'pizza_restaurant',
+      'ramen_restaurant',
+      'sandwich_shop',
+      'seafood_restaurant',
+      'spanish_restaurant',
+      'steak_house',
+      'sushi_restaurant',
+      'thai_restaurant',
+      'turkish_restaurant',
+      'vegan_restaurant',
+      'vegetarian_restaurant',
+      'vietnamese_restaurant'
+    ];
+
+    // Filter types to only include food-related categories
+    return types.filter(type => foodTypePatterns.includes(type));
   }
 
   /**

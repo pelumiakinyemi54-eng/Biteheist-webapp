@@ -35,12 +35,11 @@ class GooglePlacesService {
         return response.data.results || []
       } else {
         console.warn('Google Places API response:', response.data)
-        return this.getMockSearchResults(query)
+        return []
       }
     } catch (error) {
       console.error('Google Places search error:', error)
-      // Return mock data for development
-      return this.getMockSearchResults(query)
+      return []
     }
   }
 
@@ -61,11 +60,11 @@ class GooglePlacesService {
       if (response.data && response.data.status === 'OK') {
         return response.data.result
       } else {
-        return this.getMockPlaceDetails(placeId)
+        return null
       }
     } catch (error) {
       console.error('Google Places details error:', error)
-      return this.getMockPlaceDetails(placeId)
+      return null
     }
   }
 
@@ -87,11 +86,11 @@ class GooglePlacesService {
       if (response.data && response.data.status === 'OK') {
         return response.data.results || []
       } else {
-        return this.getMockCompetitors()
+        return []
       }
     } catch (error) {
       console.error('Nearby search error:', error)
-      return this.getMockCompetitors()
+      return []
     }
   }
 
@@ -115,127 +114,6 @@ class GooglePlacesService {
     }
   }
 
-  /**
-   * Mock search results for development/demo
-   */
-  getMockSearchResults(query) {
-    const mockResults = [
-      {
-        place_id: 'ChIJgUbEo8cfqokR5lP9_Wh_DaM',
-        name: "Talkin' Tacos",
-        formatted_address: '1234 Ocean Drive, Miami Beach, FL 33139, USA',
-        rating: 4.2,
-        user_ratings_total: 156,
-        price_level: 2
-      },
-      {
-        place_id: 'ChIJXYZ123456789',
-        name: 'Taco Bell',
-        formatted_address: '5678 Collins Avenue, Miami Beach, FL 33140, USA',
-        rating: 3.8,
-        user_ratings_total: 89,
-        price_level: 1
-      },
-      {
-        place_id: 'ChIJABC987654321',
-        name: 'El Taco Loco',
-        formatted_address: '9012 Washington Avenue, Miami Beach, FL 33141, USA',
-        rating: 4.5,
-        user_ratings_total: 234,
-        price_level: 2
-      }
-    ]
-
-    // Filter results based on query for more realistic behavior
-    return mockResults.filter(place => 
-      place.name.toLowerCase().includes(query.toLowerCase()) ||
-      query.toLowerCase().includes('taco') ||
-      query.toLowerCase().includes('miami')
-    )
-  }
-
-  /**
-   * Mock place details
-   */
-  getMockPlaceDetails(placeId) {
-    return {
-      place_id: placeId,
-      name: "Talkin' Tacos",
-      formatted_address: '1234 Ocean Drive, Miami Beach, FL 33139, USA',
-      rating: 4.2,
-      user_ratings_total: 156,
-      website: 'https://www.talkintacos.com',
-      formatted_phone_number: '(305) 555-0123',
-      reviews: [
-        {
-          author_name: 'John Doe',
-          rating: 5,
-          text: 'Amazing tacos! Will definitely come back.',
-          time: Date.now() / 1000 - 86400 * 7
-        },
-        {
-          author_name: 'Jane Smith', 
-          rating: 4,
-          text: 'Good food but service could be faster.',
-          time: Date.now() / 1000 - 86400 * 14
-        }
-      ],
-      geometry: {
-        location: {
-          lat: 25.7617,
-          lng: -80.1918
-        }
-      }
-    }
-  }
-
-  /**
-   * Mock competitors data
-   */
-  getMockCompetitors() {
-    return [
-      {
-        place_id: 'comp_1',
-        name: 'Pizza Palace',
-        vicinity: '0.2 miles away',
-        rating: 4.3,
-        user_ratings_total: 234,
-        price_level: 2
-      },
-      {
-        place_id: 'comp_2',
-        name: 'Burger Barn',
-        vicinity: '0.4 miles away',
-        rating: 3.9,
-        user_ratings_total: 156,
-        price_level: 1
-      },
-      {
-        place_id: 'comp_3',
-        name: 'Taco Time',
-        vicinity: '0.6 miles away',
-        rating: 4.1,
-        user_ratings_total: 89,
-        price_level: 2
-      },
-      {
-        place_id: 'comp_4',
-        name: 'Sandwich Shop',
-        vicinity: '0.8 miles away',
-        rating: 4.5,
-        user_ratings_total: 312,
-        price_level: 3
-      },
-      {
-        place_id: 'comp_5',
-        name: 'Deli Delicious',
-        vicinity: '1.0 miles away',
-        rating: 3.8,
-        user_ratings_total: 67,
-        price_level: 2
-      }
-    ]
-  }
 
   /**
    * Run audit for a restaurant using backend API
@@ -248,12 +126,12 @@ class GooglePlacesService {
       if (response.data && response.data.success) {
         return this.transformAuditData(response.data.audit)
       } else {
-        console.warn('Backend audit failed, using mock data')
-        return this.getMockAuditData(placeId)
+        console.warn('Backend audit failed')
+        throw new Error('Audit failed: ' + (response.data?.message || 'Unknown error'))
       }
     } catch (error) {
       console.error('Audit API error:', error)
-      return this.getMockAuditData(placeId)
+      throw error
     }
   }
 
@@ -263,6 +141,7 @@ class GooglePlacesService {
   transformAuditData(audit) {
     return {
       restaurant: {
+        placeId: audit.restaurant.placeId,
         name: audit.restaurant.name,
         address: audit.restaurant.address,
         rating: audit.restaurant.rating,
@@ -336,86 +215,6 @@ class GooglePlacesService {
     }
 
     return issues
-  }
-
-  /**
-   * Mock audit data for development
-   */
-  getMockAuditData(placeId) {
-    return {
-      restaurant: {
-        name: "Talkin' Tacos",
-        address: '1234 Ocean Drive, Miami Beach, FL 33139',
-        rating: 4.2,
-        total_ratings: 156,
-        website: 'https://www.talkintacos.com',
-        phone: '(305) 555-0123'
-      },
-      overallScore: 72,
-      grade: 'B',
-      metrics: {
-        seo: 68,
-        performance: 75,
-        reviews: 84,
-        responseTime: 62
-      },
-      competitors: this.getMockCompetitors(),
-      seoIssues: [
-        {
-          title: 'Title Tag Too Short',
-          description: 'Your title tag is only 35 characters. Expand to 50-60 characters.',
-          severity: 'medium',
-          impact: 'Lost clicks from search results'
-        },
-        {
-          title: 'Missing Schema Markup',
-          description: 'No Restaurant schema found. This helps Google understand your business.',
-          severity: 'high',
-          impact: 'Lower rankings in local search'
-        }
-      ],
-      pagespeed: {
-        score: 75,
-        loadTime: 3.2,
-        metrics: {
-          firstContentfulPaint: 1.8,
-          largestContentfulPaint: 2.5,
-          cumulativeLayoutShift: 0.12
-        }
-      },
-      revenueImpact: {
-        monthly: 2400,
-        annual: 28800,
-        breakdown: {
-          seo: 800,
-          speed: 600,
-          reviews: 600,
-          response: 400
-        }
-      },
-      actionItems: [
-        {
-          priority: 'high',
-          category: 'SEO',
-          title: 'Add Restaurant Schema Markup',
-          description: 'Implement structured data to improve search visibility',
-          estimatedRevenue: 800,
-          timeframe: '1-2 weeks'
-        },
-        {
-          priority: 'high',
-          category: 'Website',
-          title: 'Optimize Page Load Speed',
-          description: 'Reduce load time from 3.2s to under 2.5s',
-          estimatedRevenue: 600,
-          timeframe: '1 week'
-        }
-      ],
-      messages: {
-        primary: 'You could be earning $2,400 more per month',
-        secondary: 'Your SEO score of 72 is good, but optimization could increase revenue by 35%'
-      }
-    }
   }
 }
 

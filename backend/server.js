@@ -5,9 +5,11 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const { connectDB } = require('./config/database');
+const { getSchedulerInstance } = require('./services/schedulerService');
 
 // Import routes
 const restaurantRoutes = require('./routes/restaurants');
+const analyticsRoutes = require('./routes/analytics');
 
 // Initialize Express app
 const app = express();
@@ -40,6 +42,10 @@ winston.configure({
 // Connect to MongoDB
 connectDB();
 
+// Initialize scheduler service
+const scheduler = getSchedulerInstance();
+scheduler.initialize();
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: false, // Disable for development
@@ -51,7 +57,10 @@ const corsOptions = {
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
     process.env.FRONTEND_URL_ALT || 'http://127.0.0.1:5173',
+    'http://localhost:3000', // Vite dev server
+    'http://localhost:3001', // Vite dev server (alternate)
     'http://localhost:3002', // Vite dev server
+    'http://localhost:3003', // Vite dev server
     'http://localhost:5174', // Additional port for development
     'http://localhost:5175'  // Additional port for development
   ],
@@ -97,6 +106,10 @@ app.use('/api', limiter);
 
 // API Routes
 app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/ai', require('./routes/ai'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/branding', require('./routes/branding'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

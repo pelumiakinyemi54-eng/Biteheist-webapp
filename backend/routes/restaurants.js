@@ -2,14 +2,30 @@ const express = require('express');
 const { query, validationResult } = require('express-validator');
 const Restaurant = require('../models/Restaurant');
 const Audit = require('../models/Audit');
+const RankingHistory = require('../models/RankingHistory');
+const CompetitorSnapshot = require('../models/CompetitorSnapshot');
 const GooglePlacesService = require('../services/googlePlaces');
+const PageSpeedService = require('../services/pageSpeedService');
+const ReviewAnalyzer = require('../services/reviewAnalyzer');
+const RankingService = require('../services/rankingService');
 const RevenueCalculator = require('../services/revenueCalculator');
+const SEOIssueDetector = require('../services/seoIssueDetector');
+const SentimentAnalyzer = require('../services/sentimentAnalyzer');
+const TaskQueue = require('../services/taskQueue');
+const MongoService = require('../services/mongoService');
 const { optionalAuth, auth } = require('../middleware/auth');
 const { isMongoConnected } = require('../config/database');
 const winston = require('winston');
 
 const router = express.Router();
 const googlePlaces = new GooglePlacesService();
+const pageSpeedService = new PageSpeedService();
+const reviewAnalyzer = new ReviewAnalyzer();
+const rankingService = new RankingService();
+const seoIssueDetector = new SEOIssueDetector();
+const sentimentAnalyzer = new SentimentAnalyzer();
+const taskQueue = new TaskQueue();
+const mongoService = new MongoService();
 
 /**
  * @route   GET /api/restaurants/search
@@ -254,19 +270,30 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
       };
     }
 
-    // Get competitors for comparison
+    // Get competitors for comparison (prioritizing food type similarity)
     let competitors = [];
     if (restaurant.location) {
       try {
         competitors = await googlePlaces.findNearbyCompetitors(
           restaurant.location.lat,
           restaurant.location.lng,
-          { radius: 1000, maxResults: 5 }
+          {
+            radius: 10000,  // 10km radius to find more similar restaurants
+            maxResults: 20, // Get more to accurately calculate ranking
+            restaurantTypes: restaurant.types || []
+          }
         );
       } catch (error) {
         winston.warn(`Competitor search failed: ${error.message}`);
       }
     }
+
+    // Calculate accurate Google search ranking based on food type similarity
+    const rankingData = rankingService.calculateGoogleRank(restaurant, competitors);
+    const googleRank = rankingData.googleRank;
+    const localRank = rankingData.googleRank; // Same for now
+
+    winston.info(`Ranking: ${restaurant.name} is #${googleRank} among ${competitors.length + 1} similar restaurants`);
 
     // Initialize revenue calculator
     const revenueCalculator = new RevenueCalculator();
@@ -280,8 +307,8 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
 
     // Calculate SEO metrics and scores
     const seoScore = calculateSeoScore(restaurant);
-    const pageSpeedScore = await calculatePageSpeedScore(restaurant.website);
-    const responseTimeScore = calculateResponseTimeScore(restaurant.reviews);
+    const pageSpeedScore = await pageSpeedService.analyzeWebsite(restaurant.website);
+    const responseTimeScore = reviewAnalyzer.analyzeResponseTime(restaurant.reviews);
 
     // Prepare metrics for revenue calculation
     const metrics = {
@@ -311,60 +338,33 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
         website: restaurant.website,
         phone: restaurant.phone,
         photos: restaurant.photos.slice(0, 3), // First 3 photos
-        reviews: restaurant.reviews && restaurant.reviews.length > 0 ? restaurant.reviews : [
-          // Sample reviews for demonstration when no real reviews are available
-          {
-            author: "Sarah M.",
-            rating: 4,
-            text: "Great food and fast service! The staff was very friendly and helpful. Will definitely come back again.",
-            time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-            relativeTime: "a week ago"
-          },
-          {
-            author: "Mike J.",
-            rating: 3,
-            text: "Good location and clean restaurant. Food was okay but could be better. Service was quick though.",
-            time: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-            relativeTime: "2 weeks ago"
-          },
-          {
-            author: "Lisa K.",
-            rating: 2,
-            text: "The order took longer than expected and the food wasn't as hot as I'd like. The place could use some improvement.",
-            time: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
-            relativeTime: "3 weeks ago"
-          },
-          {
-            author: "David R.",
-            rating: 5,
-            text: "Excellent experience! Quick service, hot food, and friendly staff. Exactly what you expect from this brand.",
-            time: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-            relativeTime: "10 days ago"
-          },
-          {
-            author: "Jennifer W.",
-            rating: 3,
-            text: "Average experience. The food met expectations but nothing special. Good for a quick meal.",
-            time: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-            relativeTime: "5 days ago"
-          },
-          {
-            author: "Carlos P.",
-            rating: 4,
-            text: "Convenient location with decent food quality. Staff could be more attentive but overall satisfied.",
-            time: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-            relativeTime: "a month ago"
-          }
-        ], // Include customer reviews with fallback samples
+        reviews: restaurant.reviews || [], // Real reviews from Google Places
         hours: restaurant.hours,
         types: restaurant.types,
         location: restaurant.location
       },
-      competitors: competitors.map(comp => ({
+      ranking: {
+        googleRank,
+        localRank,
+        totalCompetitors: competitors.length,
+        similarRestaurants: rankingData.analysis.similarRestaurants,
+        strongerCompetitors: rankingData.analysis.strongerCompetitors,
+        yourScore: rankingData.yourScore,
+        topCompetitors: rankingData.scoredRestaurants.slice(0, 5).map(r => ({
+          name: r.name,
+          rank: rankingData.scoredRestaurants.indexOf(r) + 1,
+          rating: r.rating,
+          totalRatings: r.totalRatings,
+          similarityScore: Math.round(r.similarityScore),
+          distance: r.distance
+        }))
+      },
+      competitors: competitors.slice(0, 10).map(comp => ({ // Show top 10 competitors
         name: comp.name,
         rating: comp.rating,
         totalRatings: comp.totalRatings,
-        distance: comp.distance
+        distance: comp.distance,
+        types: comp.types || []
       })),
       scores: {
         seo: seoScore,
@@ -401,6 +401,20 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
       auditDate: new Date().toISOString()
     };
 
+    // NEW FEATURES: Add advanced analytics
+    // 1. SEO Issue Detection with Fix Recommendations
+    const seoIssues = seoIssueDetector.detectIssues(auditResult);
+    auditResult.seoIssues = seoIssues;
+    auditResult.seoImpact = seoIssueDetector.calculateTotalImpact(seoIssues);
+
+    // 2. Review Sentiment Analysis
+    const sentimentAnalysis = sentimentAnalyzer.analyzeReviews(restaurant.reviews || []);
+    auditResult.sentimentAnalysis = sentimentAnalysis;
+
+    // 3. Priority Task Queue by Revenue Impact
+    const priorityTasks = taskQueue.generateTaskQueue(seoIssues, sentimentAnalysis, auditResult);
+    auditResult.taskQueue = priorityTasks;
+
     // Save audit to database if user is authenticated and MongoDB is connected
     let savedAudit = null;
     if (req.user && isMongoConnected()) {
@@ -433,6 +447,19 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
         winston.error(`Failed to save audit: ${error.message}`);
         // Don't fail the request if audit save fails
       }
+    }
+
+    // SAVE HISTORICAL DATA: Save ranking and competitor snapshots (public audits too)
+    if (isMongoConnected()) {
+      // Save ranking history snapshot (non-blocking)
+      mongoService.saveRankingSnapshot(auditResult).catch(err => {
+        winston.error(`Failed to save ranking snapshot: ${err.message}`);
+      });
+
+      // Save competitor snapshot (non-blocking)
+      mongoService.saveCompetitorSnapshot(auditResult).catch(err => {
+        winston.error(`Failed to save competitor snapshot: ${err.message}`);
+      });
     }
 
     res.json({
@@ -555,73 +582,6 @@ function calculateSeoScore(restaurant) {
   };
 }
 
-/**
- * Calculate page speed score (mock implementation)
- */
-async function calculatePageSpeedScore(website) {
-  if (!website) {
-    return {
-      score: 0,
-      loadTime: 5.0,
-      metrics: {
-        firstContentfulPaint: 3.5,
-        largestContentfulPaint: 5.0,
-        cumulativeLayoutShift: 0.25
-      },
-      hasWebsite: false
-    };
-  }
-
-  // Mock page speed analysis
-  // In production, integrate with Google PageSpeed Insights API
-  const mockLoadTime = 2.5 + Math.random() * 2; // 2.5-4.5 seconds
-  const score = Math.max(0, Math.round(100 - (mockLoadTime - 1) * 20));
-
-  return {
-    score,
-    loadTime: Math.round(mockLoadTime * 10) / 10,
-    metrics: {
-      firstContentfulPaint: Math.round((mockLoadTime * 0.6) * 10) / 10,
-      largestContentfulPaint: Math.round((mockLoadTime * 0.9) * 10) / 10,
-      cumulativeLayoutShift: Math.round(Math.random() * 0.3 * 100) / 100
-    },
-    hasWebsite: true
-  };
-}
-
-/**
- * Calculate response time score based on reviews
- */
-function calculateResponseTimeScore(reviews) {
-  if (!reviews || reviews.length === 0) {
-    return {
-      score: 50,
-      avgResponseTime: 48,
-      responseRate: 0.3,
-      hasData: false
-    };
-  }
-
-  // Mock response time analysis
-  // In production, analyze review responses and timestamps
-  const mockResponseRate = 0.4 + Math.random() * 0.4; // 40-80%
-  const mockAvgResponseTime = 24 + Math.random() * 48; // 24-72 hours
-
-  let score = 100;
-  if (mockAvgResponseTime > 72) score -= 40;
-  else if (mockAvgResponseTime > 48) score -= 25;
-  else if (mockAvgResponseTime > 24) score -= 10;
-
-  if (mockResponseRate < 0.5) score -= 30;
-  else if (mockResponseRate < 0.8) score -= 15;
-
-  return {
-    score: Math.max(0, score),
-    avgResponseTime: Math.round(mockAvgResponseTime),
-    responseRate: Math.round(mockResponseRate * 100) / 100,
-    hasData: true
-  };
-}
 
 /**
  * Generate actionable items based on audit results
@@ -696,6 +656,87 @@ function generateActionItems(seoScore, pageSpeedScore, restaurant, competitors) 
     const priorityOrder = { high: 3, medium: 2, low: 1 };
     return priorityOrder[b.priority] - priorityOrder[a.priority];
   });
+}
+
+/**
+ * Save analytics snapshots (ranking history and competitor data)
+ */
+async function saveAnalyticsSnapshots(restaurant, auditResult, competitors) {
+  try {
+    const WeeklyReport = require('../models/WeeklyReport');
+    const weekInfo = WeeklyReport.getCurrentWeekInfo();
+
+    // Use the ranking data from audit result (already calculated accurately)
+    const googleRank = auditResult.ranking?.googleRank || 1;
+    const localRank = auditResult.ranking?.localRank || googleRank;
+
+    // Save ranking history snapshot
+    const rankingSnapshot = new RankingHistory({
+      restaurantId: restaurant._id || null,
+      placeId: restaurant.placeId,
+      restaurantName: restaurant.name,
+      googleRank,
+      localRank,
+      totalCompetitors: competitors.length,
+      overallScore: auditResult.scores.overall,
+      seoScore: auditResult.scores.seo.score,
+      performanceScore: auditResult.scores.pageSpeed.score,
+      rating: restaurant.rating,
+      totalRatings: restaurant.totalRatings,
+      estimatedMonthlyVisitors: auditResult.parameters?.monthlyVisitors || 1000,
+      revenueImpact: auditResult.revenueImpact,
+      weekNumber: weekInfo.weekNumber,
+      year: weekInfo.year
+    });
+
+    await rankingSnapshot.save();
+    winston.info(`Ranking snapshot saved for ${restaurant.name}`);
+
+    // Save competitor snapshot
+    const competitorsWithRank = competitors.map((comp, index) => {
+      const rank = sortedByRating.findIndex(r => r.name === comp.name) + 1;
+      return {
+        placeId: comp.placeId || `temp_${index}`,
+        name: comp.name,
+        rating: comp.rating,
+        totalRatings: comp.totalRatings || comp.user_ratings_total,
+        distance: comp.distance || 0,
+        rank,
+        types: comp.types || [],
+        ratingChange: 0,
+        reviewsChange: 0,
+        rankChange: 0
+      };
+    });
+
+    const competitorStats = {
+      averageRating: competitors.reduce((sum, c) => sum + (c.rating || 0), 0) / competitors.length,
+      averageReviews: competitors.reduce((sum, c) => sum + (c.totalRatings || c.user_ratings_total || 0), 0) / competitors.length,
+      totalCompetitors: competitors.length,
+      strongerCompetitors: competitors.filter(c => (c.rating || 0) > restaurant.rating).length,
+      weakerCompetitors: competitors.filter(c => (c.rating || 0) < restaurant.rating).length
+    };
+
+    const competitorSnapshot = new CompetitorSnapshot({
+      restaurantId: restaurant._id || null,
+      placeId: restaurant.placeId,
+      competitors: competitorsWithRank,
+      competitorStats,
+      yourPosition: {
+        rank: googleRank,
+        percentile: Math.round((1 - (googleRank - 1) / allRestaurants.length) * 100)
+      },
+      weekNumber: weekInfo.weekNumber,
+      year: weekInfo.year
+    });
+
+    await competitorSnapshot.save();
+    winston.info(`Competitor snapshot saved for ${restaurant.name}`);
+
+  } catch (error) {
+    winston.error(`Error saving analytics snapshots: ${error.message}`);
+    throw error;
+  }
 }
 
 module.exports = router;

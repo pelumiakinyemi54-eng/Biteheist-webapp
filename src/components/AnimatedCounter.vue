@@ -27,6 +27,8 @@ export default {
       default: 0
     },
     className: {
+
+    
       type: String,
       default: ''
     }

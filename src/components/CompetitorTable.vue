@@ -83,8 +83,10 @@
                 <div class="min-w-0 flex-1">
                   <div class="font-medium text-gray-800 truncate">{{ competitor.name }}</div>
                   <div class="text-sm text-gray-500 truncate">{{ competitor.vicinity || 'Nearby' }}</div>
-                  <div v-if="competitor.types" class="text-xs text-gray-400 mt-1">
-                    {{ formatTypes(competitor.types) }}
+                  <div v-if="competitor.types && competitor.types.length > 0" class="flex items-center gap-1 mt-1">
+                    <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
+                      {{ formatTypes(competitor.types) }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -340,10 +342,19 @@ export default {
     
     formatTypes(types) {
       if (!types || types.length === 0) return ''
-      const formatted = types
-        .filter(type => !['establishment', 'point_of_interest'].includes(type))
-        .map(type => type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
-        .slice(0, 2)
+
+      // Filter to food-specific types
+      const foodTypes = types.filter(type =>
+        type.includes('restaurant') ||
+        type.includes('food') ||
+        ['bakery', 'cafe', 'bar', 'sandwich_shop', 'ice_cream_shop', 'coffee_shop'].includes(type)
+      ).filter(type => !['establishment', 'point_of_interest', 'restaurant'].includes(type))
+
+      if (foodTypes.length === 0) return ''
+
+      const formatted = foodTypes
+        .map(type => type.replace(/_restaurant$/g, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+        .slice(0, 1) // Show only the first/primary food type
       return formatted.join(', ')
     }
   }
