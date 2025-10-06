@@ -62,6 +62,8 @@ const allowedOrigins = [
   'http://localhost:3001', // Vite dev server (alternate)
   'http://localhost:3002', // Vite dev server
   'http://localhost:3003', // Vite dev server
+  'http://localhost:3004', // Vite dev server
+  'http://localhost:3005', // Vite dev server
   'http://localhost:5174', // Additional port for development
   'http://localhost:5175'  // Additional port for development
 ].filter(Boolean);
