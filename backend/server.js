@@ -244,61 +244,65 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  winston.error('Unhandled Promise Rejection:', err);
+// Start server only if not in Vercel serverless environment
+if (process.env.VERCEL !== '1') {
+  // Start server
+  const server = app.listen(PORT, () => {
+    winston.info('🚀 BiteHeist Restaurant SEO Audit API');
+    winston.info(`📡 Server running on port ${PORT}`);
+    winston.info(`🌍 Environment: ${NODE_ENV}`);
+    winston.info(`📊 API Version: ${API_VERSION}`);
+    winston.info(`🔑 Google Places API: ${process.env.GOOGLE_PLACES_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
+    winston.info(`📅 Started: ${new Date().toISOString()}`);
+    winston.info(`🌐 CORS Origins: ${allowedOrigins.join(', ')}`);
+    winston.info(`⚡ Rate Limit: ${process.env.RATE_LIMIT_REQUESTS_PER_HOUR || 1000} requests/hour`);
+    winston.info('');
+    winston.info('💡 API Endpoints:');
+    winston.info(`   📋 Status: http://localhost:${PORT}/api/status`);
+    winston.info(`   📖 Docs: http://localhost:${PORT}/api/docs`);
+    winston.info(`   🔍 Search: http://localhost:${PORT}/api/restaurants/search?query=pizza`);
+    winston.info(`   🏥 Health: http://localhost:${PORT}/health`);
+    winston.info('');
+    winston.info('🎯 Ready for restaurant SEO audits with revenue impact analysis!');
+  });
 
-  // Close server & exit process
-  if (NODE_ENV === 'production') {
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (err) => {
+    winston.error('Unhandled Promise Rejection:', err);
+
+    // Close server & exit process
+    if (NODE_ENV === 'production') {
+      server.close(() => {
+        process.exit(1);
+      });
+    }
+  });
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (err) => {
+    winston.error('Uncaught Exception:', err);
+    process.exit(1);
+  });
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    winston.info('SIGTERM received. Shutting down gracefully...');
+
     server.close(() => {
-      process.exit(1);
+      winston.info('Process terminated');
+      process.exit(0);
     });
-  }
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  winston.error('Uncaught Exception:', err);
-  process.exit(1);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  winston.info('SIGTERM received. Shutting down gracefully...');
-
-  server.close(() => {
-    winston.info('Process terminated');
-    process.exit(0);
   });
-});
 
-process.on('SIGINT', () => {
-  winston.info('SIGINT received. Shutting down gracefully...');
+  process.on('SIGINT', () => {
+    winston.info('SIGINT received. Shutting down gracefully...');
 
-  server.close(() => {
-    winston.info('Process terminated');
-    process.exit(0);
+    server.close(() => {
+      winston.info('Process terminated');
+      process.exit(0);
+    });
   });
-});
+}
 
-// Start server
-const server = app.listen(PORT, () => {
-  winston.info('🚀 BiteHeist Restaurant SEO Audit API');
-  winston.info(`📡 Server running on port ${PORT}`);
-  winston.info(`🌍 Environment: ${NODE_ENV}`);
-  winston.info(`📊 API Version: ${API_VERSION}`);
-  winston.info(`🔑 Google Places API: ${process.env.GOOGLE_PLACES_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
-  winston.info(`📅 Started: ${new Date().toISOString()}`);
-  winston.info(`🌐 CORS Origins: ${allowedOrigins.join(', ')}`);
-  winston.info(`⚡ Rate Limit: ${process.env.RATE_LIMIT_REQUESTS_PER_HOUR || 1000} requests/hour`);
-  winston.info('');
-  winston.info('💡 API Endpoints:');
-  winston.info(`   📋 Status: http://localhost:${PORT}/api/status`);
-  winston.info(`   📖 Docs: http://localhost:${PORT}/api/docs`);
-  winston.info(`   🔍 Search: http://localhost:${PORT}/api/restaurants/search?query=pizza`);
-  winston.info(`   🏥 Health: http://localhost:${PORT}/health`);
-  winston.info('');
-  winston.info('🎯 Ready for restaurant SEO audits with revenue impact analysis!');
-});
-
+// Export the Express app for Vercel serverless
 module.exports = app;
