@@ -287,7 +287,7 @@ const server = app.listen(PORT, () => {
   winston.info(`📊 API Version: ${API_VERSION}`);
   winston.info(`🔑 Google Places API: ${process.env.GOOGLE_PLACES_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
   winston.info(`📅 Started: ${new Date().toISOString()}`);
-  winston.info(`🌐 CORS Origins: ${corsOptions.origin.join(', ')}`);
+  winston.info(`🌐 CORS Origins: ${allowedOrigins.join(', ')}`);
   winston.info(`⚡ Rate Limit: ${process.env.RATE_LIMIT_REQUESTS_PER_HOUR || 1000} requests/hour`);
   winston.info('');
   winston.info('💡 API Endpoints:');
