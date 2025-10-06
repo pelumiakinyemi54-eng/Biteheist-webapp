@@ -3,9 +3,9 @@ services:
   - type: web
     name: biteheist-backend
     env: node
+    rootDirectory: ./backend
     buildCommand: npm install
     startCommand: npm start
-    rootDirectory: ./backend
     envVars:
       - key: NODE_ENV
         value: production
