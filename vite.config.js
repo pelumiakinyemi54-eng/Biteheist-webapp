@@ -13,6 +13,9 @@ export default defineConfig({
     port: 3000,
     open: true
   },
+  preview: {
+    allowedHosts: ['.onrender.com']
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
