@@ -6,7 +6,10 @@ const winston = require('winston');
 class PDFReportGenerator {
   constructor() {
     this.reportsDir = path.join(__dirname, '../reports');
-    this.ensureReportsDirectory();
+    // Skip directory creation in serverless environments
+    if (process.env.VERCEL !== '1') {
+      this.ensureReportsDirectory();
+    }
   }
 
   ensureReportsDirectory() {
