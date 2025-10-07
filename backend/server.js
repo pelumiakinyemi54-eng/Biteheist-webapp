@@ -78,8 +78,8 @@ const corsOptions = {
     // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
 
-    // Allow Netlify deploy previews and production
-    if (origin && origin.includes('netlify.app')) {
+    // Allow Netlify and Vercel deploy previews and production
+    if (origin && (origin.includes('netlify.app') || origin.includes('vercel.app'))) {
       return callback(null, true);
     }
 
