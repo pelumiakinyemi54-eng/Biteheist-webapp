@@ -32,7 +32,8 @@ winston.configure({
   ),
   transports: [
     new winston.transports.Console(),
-    ...(NODE_ENV === 'production' ? [
+    // Only use file logging in non-serverless production environments
+    ...(NODE_ENV === 'production' && process.env.VERCEL !== '1' ? [
       new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
       new winston.transports.File({ filename: 'logs/combined.log' })
     ] : [])
