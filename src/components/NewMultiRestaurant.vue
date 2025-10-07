@@ -216,7 +216,7 @@ export default {
     ]);
     let searchTimeout = null;
 
-    const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
+    const API_URL = import.meta.env.VITE_API_BASE_URL || '';
 
     // Load saved restaurants from localStorage
     onMounted(() => {

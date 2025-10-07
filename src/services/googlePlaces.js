@@ -120,7 +120,7 @@ class GooglePlacesService {
    */
   async auditRestaurant(placeId) {
     try {
-      const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003'
+      const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || ''
       const response = await axios.post(`${BACKEND_URL}/api/restaurants/${placeId}/audit`)
 
       if (response.data && response.data.success) {

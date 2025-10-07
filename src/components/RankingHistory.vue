@@ -194,7 +194,7 @@ export default {
     async loadHistory() {
       this.loading = true
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003'
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
         // Build query params
         let queryParams = `days=${this.selectedPeriod}`
