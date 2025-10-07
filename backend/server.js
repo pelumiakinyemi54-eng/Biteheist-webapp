@@ -39,12 +39,16 @@ winston.configure({
   ]
 });
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (skip in Vercel serverless)
+if (process.env.VERCEL !== '1') {
+  connectDB();
 
-// Initialize scheduler service
-const scheduler = getSchedulerInstance();
-scheduler.initialize();
+  // Initialize scheduler service
+  const scheduler = getSchedulerInstance();
+  scheduler.initialize();
+} else {
+  winston.info('Running in Vercel serverless - skipping DB and scheduler initialization');
+}
 
 // Security middleware
 app.use(helmet({
