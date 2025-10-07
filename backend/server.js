@@ -73,6 +73,11 @@ const corsOptions = {
     // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
 
+    // Allow Netlify deploy previews and production
+    if (origin && origin.includes('netlify.app')) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
       callback(null, true);
     } else {
