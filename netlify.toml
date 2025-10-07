@@ -11,6 +11,10 @@
   node_bundler = "esbuild"
   included_files = ["backend/**"]
 
+[functions."api"]
+  node_bundler = "esbuild"
+  external_node_modules = ["express"]
+
 # Redirect API calls to serverless function
 [[redirects]]
   from = "/api/*"
