@@ -219,6 +219,167 @@
 
     <!-- Dashboard Content -->
     <main v-else-if="auditData && activeSection === 'dashboard'" class="container mx-auto px-4 py-8">
+
+      <!-- Two Column Layout -->
+      <div class="flex gap-8">
+
+        <!-- Left Sidebar Score Card -->
+        <aside class="w-80 flex-shrink-0 sticky top-8 h-fit no-print">
+          <div class="card-shadow bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
+            <!-- Circular Score Gauge -->
+            <div class="flex flex-col items-center mb-8">
+              <div class="relative w-48 h-48">
+                <svg class="transform -rotate-90 w-48 h-48">
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="88"
+                    stroke="#e5e7eb"
+                    stroke-width="12"
+                    fill="none"
+                  />
+                  <circle
+                    cx="96"
+                    cy="96"
+                    r="88"
+                    :stroke="getScoreColor(auditData.overallScore)"
+                    stroke-width="12"
+                    fill="none"
+                    :stroke-dasharray="553"
+                    :stroke-dashoffset="553 - (553 * auditData.overallScore) / 100"
+                    class="transition-all duration-1000"
+                  />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <div class="text-6xl font-bold text-gray-900">{{ auditData.overallScore }}</div>
+                  <div class="text-gray-500 text-sm">/ 100</div>
+                </div>
+              </div>
+              <div class="text-center mt-4">
+                <div class="text-sm text-gray-600 uppercase tracking-wide mb-1">Online health grade</div>
+                <div class="text-2xl font-bold" :class="getScoreColorText(auditData.overallScore)">
+                  {{ getScoreLabel(auditData.overallScore) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="space-y-4 mb-6">
+              <!-- Search Results -->
+              <div
+                class="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                @click="scrollToSection('search-results-section')"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center"
+                    :class="calculateSearchResultsScore(auditData) >= 32 ? 'bg-green-100' : calculateSearchResultsScore(auditData) >= 24 ? 'bg-blue-100' : calculateSearchResultsScore(auditData) >= 16 ? 'bg-yellow-100' : 'bg-orange-100'"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      :class="calculateSearchResultsScore(auditData) >= 32 ? 'text-green-600' : calculateSearchResultsScore(auditData) >= 24 ? 'text-blue-600' : calculateSearchResultsScore(auditData) >= 16 ? 'text-yellow-600' : 'text-orange-600'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900 text-sm">Search Results</div>
+                    <div
+                      class="text-xs font-semibold"
+                      :class="getScoreStatus(calculateSearchResultsScore(auditData), 40).color"
+                    >
+                      {{ getScoreStatus(calculateSearchResultsScore(auditData), 40).label }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-gray-900">{{ calculateSearchResultsScore(auditData) }}</div>
+                  <div class="text-xs text-gray-500">/40</div>
+                </div>
+              </div>
+
+              <!-- Website Experience -->
+              <div
+                class="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                @click="scrollToSection('website-experience-section')"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center"
+                    :class="calculateWebsiteExperienceScore(auditData) >= 32 ? 'bg-green-100' : calculateWebsiteExperienceScore(auditData) >= 24 ? 'bg-blue-100' : calculateWebsiteExperienceScore(auditData) >= 16 ? 'bg-yellow-100' : 'bg-orange-100'"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      :class="calculateWebsiteExperienceScore(auditData) >= 32 ? 'text-green-600' : calculateWebsiteExperienceScore(auditData) >= 24 ? 'text-blue-600' : calculateWebsiteExperienceScore(auditData) >= 16 ? 'text-yellow-600' : 'text-orange-600'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900 text-sm">Website Experience</div>
+                    <div
+                      class="text-xs font-semibold"
+                      :class="getScoreStatus(calculateWebsiteExperienceScore(auditData), 40).color"
+                    >
+                      {{ getScoreStatus(calculateWebsiteExperienceScore(auditData), 40).label }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-gray-900">{{ calculateWebsiteExperienceScore(auditData) }}</div>
+                  <div class="text-xs text-gray-500">/40</div>
+                </div>
+              </div>
+
+              <!-- Local Listings -->
+              <div
+                class="flex items-center justify-between p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                @click="scrollToSection('local-listings-section')"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center"
+                    :class="calculateLocalListingsScore(auditData) >= 16 ? 'bg-green-100' : calculateLocalListingsScore(auditData) >= 12 ? 'bg-blue-100' : calculateLocalListingsScore(auditData) >= 8 ? 'bg-yellow-100' : 'bg-orange-100'"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      :class="calculateLocalListingsScore(auditData) >= 16 ? 'text-green-600' : calculateLocalListingsScore(auditData) >= 12 ? 'text-blue-600' : calculateLocalListingsScore(auditData) >= 8 ? 'text-yellow-600' : 'text-orange-600'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900 text-sm">Local Listings</div>
+                    <div
+                      class="text-xs font-semibold"
+                      :class="getScoreStatus(calculateLocalListingsScore(auditData), 20).color"
+                    >
+                      {{ getScoreStatus(calculateLocalListingsScore(auditData), 20).label }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-gray-900">{{ calculateLocalListingsScore(auditData) }}</div>
+                  <div class="text-xs text-gray-500">/20</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content Column -->
+        <div class="flex-1 min-w-0">
+
       <!-- Floating Action Bar -->
       <div class="fixed bottom-8 right-8 z-50 no-print">
         <div class="flex flex-col space-y-3">
@@ -246,48 +407,265 @@
       </div>
 
       <!-- Restaurant Header Card -->
-      <div class="card-shadow mb-8 hover-lift">
-        <div class="flex items-start space-x-6">
-          <!-- Restaurant Icon -->
-          <div class="flex-shrink-0">
-            <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform hover:rotate-6 hover:scale-110">
-              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Restaurant Info -->
-          <div class="flex-1">
+      <div class="card-shadow mb-8">
+        <div class="flex items-start justify-between mb-4">
+          <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ auditData.restaurant.name }}</h1>
-            <div class="flex items-center text-gray-600 mb-3">
+            <div class="flex items-center text-gray-600">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
               <span class="text-sm">{{ auditData.restaurant.address }}</span>
             </div>
+          </div>
+          <button
+            v-if="auditData.restaurant.website"
+            class="btn-primary flex items-center space-x-2"
+            @click="window.open(auditData.restaurant.website, '_blank')"
+          >
+            <span>Visit Website</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </button>
+        </div>
 
-            <!-- Distance and Website -->
-            <div class="flex items-center space-x-4">
-              <div class="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-400 rounded-lg">
-                <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="text-lg font-bold text-blue-700">
-                  {{ auditData.restaurant.distance || '2.3 mi' }}
-                </span>
-                <span class="text-sm text-blue-600 ml-2">from search location</span>
-              </div>
+        <!-- Summary Counter -->
+        <div class="pt-4 border-t border-gray-200">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            We found {{ (auditData.seoIssues?.length || 0) + (auditData.actionItems?.length || 0) }} problems with your online presence
+          </h2>
+          <p class="text-gray-600">
+            {{ getTotalCheckedItems(auditData) }} things reviewed, {{ (auditData.seoIssues?.length || 0) + (auditData.actionItems?.length || 0) }} need work
+          </p>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="card-shadow mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <!-- Search Bar -->
+          <div class="flex-1 max-w-md">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search competitors, issues..."
+                class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
               <button
-                v-if="auditData.restaurant.website"
-                class="btn-primary flex items-center space-x-2"
-                @click="window.open(auditData.restaurant.website, '_blank')"
+                v-if="searchQuery"
+                @click="searchQuery = ''"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <span>Visit Website</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Date Range Filter -->
+          <div class="flex items-center space-x-3">
+            <label class="text-sm font-medium text-gray-700">Period:</label>
+            <select
+              v-model="selectedDateRange"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium"
+            >
+              <option v-for="range in dateRanges" :key="range.value" :value="range.value">
+                {{ range.label }}
+              </option>
+            </select>
+
+            <!-- Export Button -->
+            <button
+              @click="exportPDF"
+              class="btn-primary flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>Export PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div v-if="searchQuery || selectedDateRange !== 'all_time'" class="mt-4 flex items-center gap-2 flex-wrap">
+          <span class="text-sm text-gray-600">Active filters:</span>
+          <span v-if="selectedDateRange !== 'all_time'" class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+            📅 {{ getDateRangeLabel() }}
+            <button @click="selectedDateRange = 'all_time'" class="ml-2 hover:text-blue-900">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </span>
+          <span v-if="searchQuery" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+            🔍 "{{ searchQuery }}"
+            <button @click="searchQuery = ''" class="ml-2 hover:text-green-900">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Key Metrics (4 Hero Cards) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Google Rank -->
+        <div class="card-shadow text-center">
+          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Google Rank</div>
+          <div class="text-4xl font-bold text-blue-600 mb-1">
+            #{{ calculateGoogleRank(auditData) }}
+          </div>
+          <div class="text-sm text-gray-600 mb-2">
+            of {{ auditData.ranking?.totalCompetitors ? auditData.ranking.totalCompetitors + 1 : (auditData.competitors?.length + 1 || 1) }} restaurants
+          </div>
+          <div class="flex items-center justify-center text-xs">
+            <span class="text-green-600 font-semibold flex items-center">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              +2 vs last week
+            </span>
+          </div>
+        </div>
+
+        <!-- Revenue Lost -->
+        <div class="card-shadow text-center">
+          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Revenue Lost</div>
+          <div class="text-4xl font-bold text-red-600 mb-1">
+            ${{ auditData.revenueImpact?.monthly?.toLocaleString() || '0' }}
+          </div>
+          <div class="text-sm text-gray-600 mb-2">per month</div>
+          <div class="flex items-center justify-center text-xs">
+            <span class="text-orange-600 font-semibold flex items-center">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              +8% vs last month
+            </span>
+          </div>
+        </div>
+
+        <!-- SEO Score -->
+        <div class="card-shadow text-center">
+          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">SEO Score</div>
+          <div class="text-4xl font-bold mb-1" :class="getScoreColorClass(auditData.overallScore)">
+            {{ auditData.overallScore }}/100
+          </div>
+          <div class="text-sm text-gray-600 mb-2">{{ getScoreLabel(auditData.overallScore) }}</div>
+          <div class="flex items-center justify-center text-xs">
+            <span class="text-green-600 font-semibold flex items-center">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              +3 pts this week
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick Win -->
+        <div class="card-shadow text-center bg-gradient-to-br from-green-50 to-emerald-50">
+          <div class="text-sm text-green-700 uppercase tracking-wide font-semibold mb-2">Quick Win</div>
+          <div class="text-lg font-bold text-green-800 mb-1">
+            {{ getTopQuickWin(auditData) }}
+          </div>
+          <div class="text-sm text-green-600 mb-2">Potential gain: +${{ getQuickWinRevenue(auditData) }}/mo</div>
+          <div class="text-xs text-green-700 font-semibold">
+            ⚡ Takes ~15 minutes
+          </div>
+        </div>
+      </div>
+
+      <!-- This is how you're doing online -->
+      <div class="card-shadow mb-8">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">This is how you're doing online</h2>
+          <p class="text-gray-600">Where you are showing up when customers search you, next to your competitors</p>
+        </div>
+
+        <!-- Search Query Rankings -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center space-x-4 flex-1">
+              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Best {{ (auditData.restaurant.types && auditData.restaurant.types[0]) || 'restaurant' }} in {{ extractCity(auditData.restaurant.address) }}</div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                🏆 #{{ calculateGoogleRank(auditData) }}: {{ auditData.competitors && auditData.competitors[0] ? auditData.competitors[0].name : 'Competitor' }}
+              </span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                Unranked map pack
+              </span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                Unranked organic
+              </span>
+              <button class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center space-x-4 flex-1">
+              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">{{ auditData.restaurant.name }} near me</div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                #1: {{ auditData.restaurant.name }}
+              </span>
+              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                Ranked map pack
+              </span>
+              <button class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center space-x-4 flex-1">
+              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Restaurants in {{ extractCity(auditData.restaurant.address) }}</div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                🏆 #1: {{ auditData.competitors && auditData.competitors[0] ? auditData.competitors[0].name : 'Competitor' }}
+              </span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                Unranked map pack
+              </span>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                Unranked organic
+              </span>
+              <button class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
             </div>
@@ -295,135 +673,535 @@
         </div>
       </div>
 
-      <!-- Revenue Impact Analysis (Main Focus) -->
-      <ScoreGauge
-        :score="auditData.overallScore"
-        :metrics="auditData.metrics"
-        :issues="auditData.seoIssues"
-        :revenueImpact="auditData.revenueImpact"
-      />
+      <!-- Who's Beating You on Google -->
+      <div class="card-shadow mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Who's beating you on Google</h2>
 
-      <!-- Restaurant Ranking -->
-      <RestaurantRanking
-        :googleRank="calculateGoogleRank(auditData)"
-        :localRank="calculateLocalRank(auditData)"
-        :totalCompetitors="auditData.competitors?.length || 0"
-        :distance="auditData.restaurant.distance || '2.3 mi'"
-        :rankChange="calculateRankChange(auditData)"
-      />
-
-      <!-- Customer Reviews Section -->
-      <ReviewsSection
-        :reviews="auditData.restaurant.reviews || []"
-        :totalReviews="auditData.restaurant.total_ratings || 0"
-        :averageRating="auditData.restaurant.rating || 0"
-      />
-
-      <!-- Performance Cards (4 Cards Grid) -->
-      <PerformanceCards
-        :revenueImpact="auditData.revenueImpact?.breakdown || {}"
-        :rating="auditData.restaurant.rating"
-        :speedScore="auditData.metrics?.performance || 0"
-      />
-
-      <!-- Interactive Revenue Projection Slider -->
-      <RevenueProjectionSlider
-        :currentLoss="auditData.revenueImpact?.monthly || 0"
-      />
-
-      <!-- Interactive Metrics Chart -->
-      <InteractiveMetricsChart
-        :revenueImpact="auditData.revenueImpact?.breakdown || {}"
-      />
-
-      <!-- Total Opportunity Section -->
-      <div class="card-shadow mb-8 bg-gradient-to-br from-green-50 to-emerald-50">
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">Total Revenue Opportunity</h2>
-          <p class="text-gray-600">Fix these issues to unlock this monthly revenue</p>
+        <!-- Empty State -->
+        <div v-if="getTopCompetitors(auditData).length === 0" class="text-center py-12">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500">No competitors found matching your search</p>
+          <button @click="searchQuery = ''" class="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
+            Clear search
+          </button>
         </div>
-        <div class="text-center mb-8">
-          <div class="revenue-loss text-green-700 mb-2">
-            +${{ auditData.revenueImpact?.monthly?.toLocaleString() || '0' }}
-          </div>
-          <div class="text-xl text-green-800 font-medium">Potential Monthly Gain</div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="text-center p-5 bg-white rounded-xl border-2 border-blue-200">
-            <div class="text-xs text-blue-700 font-medium uppercase tracking-wide mb-2">SEO Fixes</div>
-            <div class="text-2xl font-bold text-blue-700 mb-1">
-              +${{ auditData.revenueImpact?.breakdown?.seo?.toLocaleString() || '0' }}
+
+        <!-- Competitors List -->
+        <div v-else class="space-y-3">
+          <div
+            v-for="(competitor, index) in getAllCompetitors(auditData)"
+            :key="index"
+            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+          >
+            <div class="flex items-center space-x-4 flex-1">
+              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">{{ competitor.name }}</div>
+                <div class="flex items-center text-sm text-gray-600 mt-1">
+                  <span class="font-semibold text-gray-900 mr-1">{{ competitor.rating || 'N/A' }}</span>
+                  <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                  <span class="ml-1">{{ competitor.user_ratings_total || 0 }} reviews</span>
+                </div>
+              </div>
             </div>
-            <div class="text-xs text-blue-600">Monthly gain</div>
-          </div>
-          <div class="text-center p-5 bg-white rounded-xl border-2 border-orange-200">
-            <div class="text-xs text-orange-700 font-medium uppercase tracking-wide mb-2">Speed Boost</div>
-            <div class="text-2xl font-bold text-orange-700 mb-1">
-              +${{ auditData.revenueImpact?.breakdown?.speed?.toLocaleString() || '0' }}
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-semibold" :class="getRankingColorClass(index + 1)">
+                {{ index + 1 }}{{ getOrdinalSuffix(index + 1) }}
+              </span>
             </div>
-            <div class="text-xs text-orange-600">Monthly gain</div>
-          </div>
-          <div class="text-center p-5 bg-white rounded-xl border-2 border-yellow-200">
-            <div class="text-xs text-yellow-700 font-medium uppercase tracking-wide mb-2">Review Mgmt</div>
-            <div class="text-2xl font-bold text-yellow-700 mb-1">
-              +${{ auditData.revenueImpact?.breakdown?.reviews?.toLocaleString() || '0' }}
-            </div>
-            <div class="text-xs text-yellow-600">Monthly gain</div>
-          </div>
-          <div class="text-center p-5 bg-white rounded-xl border-2 border-green-200">
-            <div class="text-xs text-green-700 font-medium uppercase tracking-wide mb-2">Engagement</div>
-            <div class="text-2xl font-bold text-green-700 mb-1">
-              +${{ auditData.revenueImpact?.breakdown?.response?.toLocaleString() || '0' }}
-            </div>
-            <div class="text-xs text-green-600">Monthly gain</div>
           </div>
         </div>
       </div>
 
-      <!-- Weekly Performance Report -->
-      <WeeklyReportView
-        v-if="auditData.restaurant && auditData.restaurant.placeId"
-        :placeId="auditData.restaurant.placeId"
-      />
+      <!-- Top 3 Issues to Fix -->
+      <div class="card-shadow mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Top Issues to Fix</h2>
 
-      <!-- Historical Ranking Tracking -->
-      <RankingHistory
-        v-if="auditData.restaurant && auditData.restaurant.placeId"
-        :placeId="auditData.restaurant.placeId"
-        :currentRank="auditData.ranking?.googleRank"
-        :currentScore="auditData.scores?.overall"
-      />
+        <!-- Empty State -->
+        <div v-if="getTopIssues(auditData).length === 0" class="text-center py-12">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p class="text-gray-500">No issues found matching your search</p>
+          <button @click="searchQuery = ''" class="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
+            Clear search
+          </button>
+        </div>
 
-      <!-- Traffic Correlation Analytics -->
-      <TrafficAnalytics
-        v-if="auditData.restaurant && auditData.restaurant.placeId"
-        :placeId="auditData.restaurant.placeId"
-        :currentRating="auditData.restaurant.rating"
-      />
+        <!-- Issues List -->
+        <div v-else class="space-y-4">
+          <div
+            v-for="(issue, index) in getTopIssues(auditData)"
+            :key="index"
+            class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+          >
+            <div class="flex-shrink-0 w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center font-bold">
+              {{ index + 1 }}
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 mb-1">{{ issue.title }}</h3>
+              <p class="text-sm text-gray-600">{{ issue.description }}</p>
+            </div>
+            <div class="text-right flex items-start space-x-4">
+              <div>
+                <div class="text-sm text-gray-500">Impact</div>
+                <div class="font-bold text-red-600">+${{ issue.impact }}/mo</div>
+              </div>
+              <!-- Action Icons -->
+              <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  class="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="View Solution"
+                >
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
+                <button
+                  class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  title="Dismiss"
+                >
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Competitor Position Monitoring -->
-      <CompetitorMonitoring
-        v-if="auditData.restaurant && auditData.restaurant.placeId"
-        :placeId="auditData.restaurant.placeId"
-      />
+      <!-- Search Results: Headline & Metadata -->
+      <div id="search-results-section" class="card-shadow mb-8">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Search Results</h2>
+            <p class="text-gray-600 text-sm">Headline & Metadata</p>
+          </div>
+        </div>
 
-      <!-- Competitor Analysis Table -->
-      <CompetitorTable
-        :competitors="auditData.competitors"
-        :restaurant="auditData.restaurant"
-      />
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center space-x-3 flex-1">
+              <svg v-if="checkHeadlineKeywords(auditData)" class="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">Headline includes keywords</div>
+                <div class="text-sm text-gray-600">Your restaurant name should include relevant search terms like cuisine type or location</div>
+              </div>
+            </div>
+          </div>
 
-      <!-- SEO Issues Grid -->
-      <SeoBlock
-        :issues="auditData.seoIssues"
-        :restaurant="auditData.restaurant"
-      />
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center space-x-3 flex-1">
+              <svg v-if="checkMetaDescription(auditData)" class="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">Meta description optimized</div>
+                <div class="text-sm text-gray-600">Compelling meta descriptions improve click-through rates from search results</div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Action Items -->
-      <ActionItems
-        :items="auditData.actionItems"
-        :score="auditData.overallScore"
-      />
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center space-x-3 flex-1">
+              <svg v-if="checkTitleTag(auditData)" class="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900">Title tag includes location</div>
+                <div class="text-sm text-gray-600">Location-based title tags help you rank for "near me" searches</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Website Experience: Guest Experience & Appearance -->
+      <div id="website-experience-section" class="card-shadow mb-8">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Guest Experience</h2>
+            <p class="text-gray-600 text-sm">Improve the experience on your website</p>
+          </div>
+        </div>
+
+        <!-- Your site Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Your site</h3>
+          <div class="space-y-3">
+            <!-- Website exists -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkWebsiteExists(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Your site exists and drives conversion and sales</div>
+                <div class="text-sm text-gray-600">Having a website is crucial for online presence</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Content</h3>
+          <div class="space-y-3">
+            <!-- On-site ordering -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkOnlineOrdering(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">On-site ordering</div>
+                <div class="text-sm text-gray-600">Having ordering built in leads to a streamlined user experience and not revenue</div>
+              </div>
+            </div>
+
+            <!-- Effective CTAs -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkEffectiveCTAs(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Effective CTAs or online ordering</div>
+                <div class="text-sm text-gray-600">Action on products like DoorDash, Postmates or Slice can significantly increase conversions</div>
+              </div>
+            </div>
+
+            <!-- Phone number -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkPhoneNumber(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Phone number</div>
+                <div class="text-sm text-gray-600">Listing a phone number increases the number of calls and allows</div>
+              </div>
+            </div>
+
+            <!-- Favicon -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkFavicon(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Favicon</div>
+                <div class="text-sm text-gray-600">Favicon visible in tabs and bookmarks</div>
+              </div>
+            </div>
+
+            <!-- Other ordering links -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkOrderingLinks(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Other ordering links only</div>
+                <div class="text-sm text-gray-600">Having clear links or CTAs for online ordering improves conversions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Appearance</h3>
+          <div class="space-y-3">
+            <!-- Compelling About Us -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkAboutUsSection(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Compelling About Us section</div>
+                <div class="text-sm text-gray-600">Sharing more information about yourself will your customers</div>
+              </div>
+            </div>
+
+            <!-- Professional design -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkDesign(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Professional design</div>
+                <div class="text-sm text-gray-600">A clean, modern design builds trust with customers</div>
+              </div>
+            </div>
+
+            <!-- Mobile-friendly -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkMobileFriendly(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Mobile-friendly design</div>
+                <div class="text-sm text-gray-600">Responsive design ensures great experience on all devices</div>
+              </div>
+            </div>
+
+            <!-- Fast page load -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkPageSpeed(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Fast page load speed</div>
+                <div class="text-sm text-gray-600">Quick loading times reduce bounce rates and improve SEO</div>
+              </div>
+            </div>
+
+            <!-- Clear navigation -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkNavigation(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Clear navigation</div>
+                <div class="text-sm text-gray-600">Intuitive menu structure helps visitors find what they need</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Listings: Profile Content -->
+      <div id="local-listings-section" class="card-shadow mb-8">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Local Listings</h2>
+            <p class="text-gray-600 text-sm">Make your restaurant easy to find</p>
+          </div>
+        </div>
+
+        <!-- Google Business Profile Rating -->
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-1">Google Business Profile</h3>
+              <div class="flex items-center space-x-2">
+                <span class="text-2xl font-bold text-gray-900">{{ auditData.restaurant.rating || 'N/A' }}</span>
+                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                </svg>
+                <span class="text-gray-600">({{ auditData.restaurant.total_ratings || 0 }} reviews)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Content Section -->
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Profile content</h3>
+          <div class="space-y-3">
+            <!-- First-party website -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkFirstPartyWebsite(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">First-party website</div>
+                <div class="text-sm text-gray-600">Website URL is present</div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkDescription(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Description</div>
+                <div class="text-sm text-gray-600">Description long enough should be at least 50 characters & less than 750</div>
+              </div>
+            </div>
+
+            <!-- Business hours -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkBusinessHours(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Business hours</div>
+                <div class="text-sm text-gray-600">At least one day listed</div>
+              </div>
+            </div>
+
+            <!-- Phone number -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkPhoneNumber(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Phone number</div>
+                <div class="text-sm text-gray-600">(XXX) XXX-XXXX</div>
+              </div>
+            </div>
+
+            <!-- Price range -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkPriceRange(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Price range</div>
+                <div class="text-sm text-gray-600">$ - $$$$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User-submitted content Section -->
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">User-submitted content</h3>
+          <div class="space-y-3">
+            <!-- Description includes relevant keywords -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkDescriptionKeywords(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Description includes relevant keywords</div>
+                <div class="text-sm text-gray-600">Matches keywords like cuisine type, specialties, and restaurant type</div>
+              </div>
+            </div>
+
+            <!-- Categories match keywords -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkCategoryKeywords(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Categories match keywords</div>
+                <div class="text-sm text-gray-600">Google Business Profile categories align with your keywords</div>
+              </div>
+            </div>
+
+            <!-- Photos -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkPhotos(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Photos uploaded</div>
+                <div class="text-sm text-gray-600">At least 5 photos uploaded to your profile</div>
+              </div>
+            </div>
+
+            <!-- Review responses -->
+            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+              <svg v-if="checkReviewResponses(auditData)" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">Active review responses</div>
+                <div class="text-sm text-gray-600">Responding to at least 50% of your recent reviews</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        </div>
+        <!-- End Main Content Column -->
+      </div>
+      <!-- End Two Column Layout -->
     </main>
 
     <!-- Loading State -->
@@ -598,7 +1376,19 @@ export default {
         'Finalizing audit report...'
       ],
       activeSection: 'dashboard',
-      mobileMenuOpen: false
+      mobileMenuOpen: false,
+      selectedDateRange: 'all_time',
+      searchQuery: '',
+      dateRanges: [
+        { value: 'today', label: 'Today' },
+        { value: 'this_week', label: 'This Week' },
+        { value: 'this_month', label: 'This Month' },
+        { value: 'last_30_days', label: 'Last 30 Days' },
+        { value: 'last_month', label: 'Last Month' },
+        { value: 'last_year', label: 'Last Year' },
+        { value: 'this_year', label: 'This Year' },
+        { value: 'all_time', label: 'All Time' }
+      ]
     }
   },
   methods: {
@@ -629,7 +1419,7 @@ export default {
     
     async simulateAuditProcess(place) {
       const steps = this.loadingSteps
-      const stepDuration = 3000 / steps.length
+      const stepDuration = 20000 / steps.length
       
       for (let i = 0; i < steps.length; i++) {
         this.loadingMessage = steps[i]
@@ -649,24 +1439,78 @@ export default {
       return new Promise(resolve => {
         const startTime = Date.now()
         const diff = end - start
-        
+
         const animate = () => {
           const elapsed = Date.now() - startTime
           const progress = Math.min(elapsed / duration, 1)
-          
+
           this.loadingProgress = start + diff * progress
-          
+
           if (progress < 1) {
             requestAnimationFrame(animate)
           } else {
             resolve()
           }
         }
-        
+
         animate()
       })
     },
-    
+
+    showFixInstructions(type) {
+      const instructions = {
+        headline: {
+          title: 'Fix Headline Keywords',
+          content: `To fix this issue:\n\n1. Update your Google Business Profile name to include relevant keywords\n2. Add your cuisine type (e.g., "Italian Restaurant")\n3. Include your location (e.g., "Downtown Seattle")\n4. Example: "Mario's Italian Restaurant | Downtown Seattle"\n\nNote: Make sure to follow Google's naming guidelines - don't add unnecessary keywords that aren't part of your actual business name.`
+        },
+        meta: {
+          title: 'Optimize Meta Description',
+          content: `To optimize your meta description:\n\n1. Visit your website's admin panel or contact your web developer\n2. Update the meta description to 150-160 characters\n3. Include your main keywords naturally\n4. Add a call-to-action (e.g., "Book a table today!")\n5. Make it compelling and accurate\n\nExample: "Experience authentic Italian cuisine at Mario's Restaurant in Downtown Seattle. Fresh pasta, wood-fired pizza, and award-winning wine list. Book your table today!"`
+        },
+        title: {
+          title: 'Fix Title Tag',
+          content: `To fix your title tag:\n\n1. Access your website's SEO settings or contact your web developer\n2. Update the page title to include location keywords\n3. Keep it under 60 characters\n4. Format: [Business Name] | [Cuisine Type] | [Location]\n\nExample: "Mario's Restaurant | Italian Dining | Seattle, WA"`
+        },
+        mobile: {
+          title: 'Improve Mobile-Friendliness',
+          content: `To make your website mobile-friendly:\n\n1. Use a responsive website theme/template\n2. Test your site on mobile devices\n3. Ensure text is readable without zooming\n4. Make buttons and links easy to tap\n5. Optimize images for mobile loading speed\n\nTools to test: Google Mobile-Friendly Test, PageSpeed Insights`
+        },
+        speed: {
+          title: 'Improve Page Load Speed',
+          content: `To improve your page speed:\n\n1. Compress and optimize all images\n2. Enable browser caching\n3. Minify CSS, JavaScript, and HTML\n4. Use a Content Delivery Network (CDN)\n5. Remove unnecessary plugins/scripts\n6. Consider upgrading your hosting plan\n\nTools to test: Google PageSpeed Insights, GTmetrix`
+        },
+        design: {
+          title: 'Improve Website Design',
+          content: `To improve your website design:\n\n1. Use a professional, modern template\n2. Ensure consistent branding (colors, fonts, logo)\n3. Use high-quality, professional photos\n4. Create clear visual hierarchy\n5. Add white space for better readability\n6. Consider hiring a web designer\n\nPopular platforms: WordPress, Squarespace, Wix`
+        },
+        navigation: {
+          title: 'Improve Navigation',
+          content: `To improve your website navigation:\n\n1. Create a clear, simple menu structure\n2. Keep main menu items to 5-7 max\n3. Use descriptive menu labels (avoid jargon)\n4. Add a search function\n5. Include breadcrumbs for deeper pages\n6. Make your logo clickable (return to homepage)\n7. Add a visible "Book a Table" button`
+        },
+        'business-info': {
+          title: 'Complete Business Information',
+          content: `To complete your business information:\n\n1. Log into your Google Business Profile\n2. Fill out ALL fields:\n   - Business name\n   - Complete address\n   - Phone number\n   - Website URL\n   - Business hours\n   - Business category\n   - Business description\n3. Double-check for accuracy\n4. Add additional phone numbers if available\n5. Add attributes (e.g., outdoor seating, wheelchair accessible)`
+        },
+        photos: {
+          title: 'Upload More Photos',
+          content: `To add more photos to your listing:\n\n1. Log into your Google Business Profile\n2. Go to the Photos section\n3. Upload high-quality images:\n   - Exterior (at least 2-3)\n   - Interior (at least 3-4)\n   - Food/menu items (at least 5-10)\n   - Team/staff (1-2)\n   - Logo and cover photo\n\nTips:\n- Use professional photos if possible\n- Ensure good lighting\n- Show your restaurant's atmosphere\n- Update photos seasonally\n- Minimum 5 photos required, 20+ recommended`
+        },
+        reviews: {
+          title: 'Respond to Reviews',
+          content: `To improve review engagement:\n\n1. Log into your Google Business Profile\n2. Check for new reviews regularly (daily if possible)\n3. Respond to ALL reviews:\n   - Thank positive reviewers\n   - Address negative feedback professionally\n   - Personalize each response\n   - Keep responses brief (2-3 sentences)\n4. Respond within 24-48 hours\n5. Never argue with reviewers\n6. Offer to resolve issues offline\n\nExample: "Thank you for the kind words, [Name]! We're thrilled you enjoyed our pasta. Hope to see you again soon!"`
+        },
+        hours: {
+          title: 'Update Business Hours',
+          content: `To update your business hours:\n\n1. Log into your Google Business Profile\n2. Go to the Info section\n3. Update your regular hours for each day\n4. Add special hours for:\n   - Holidays\n   - Special events\n   - Temporary closures\n5. Mark yourself as "Temporarily Closed" if needed\n6. Update hours immediately when they change\n\nTip: Keep hours current to avoid frustrated customers!`
+        }
+      }
+
+      const instruction = instructions[type]
+      if (instruction) {
+        alert(`${instruction.title}\n\n${instruction.content}`)
+      }
+    },
+
     exportPDF() {
       // Add print-specific styling
       const style = document.createElement('style')
@@ -773,8 +1617,27 @@ export default {
       return 'Poor'
     },
 
+    getScoreColor(score) {
+      if (score >= 85) return '#10b981' // green
+      if (score >= 75) return '#3b82f6' // blue
+      if (score >= 65) return '#f59e0b' // orange
+      return '#ef4444' // red
+    },
+
+    getScoreColorText(score) {
+      if (score >= 85) return 'text-green-600'
+      if (score >= 75) return 'text-blue-600'
+      if (score >= 65) return 'text-orange-600'
+      return 'text-red-600'
+    },
+
     calculateGoogleRank(auditData) {
-      // Calculate rank based on rating and reviews compared to competitors
+      // Use backend-calculated rank if available (this is the real Google ranking)
+      if (auditData && auditData.ranking && auditData.ranking.googleRank) {
+        return auditData.ranking.googleRank
+      }
+
+      // Fallback: Calculate rank based on rating and reviews compared to competitors
       if (!auditData || !auditData.competitors) return 1
 
       const allRestaurants = [
@@ -797,7 +1660,12 @@ export default {
     },
 
     calculateLocalRank(auditData) {
-      // Calculate local rank based on rating only
+      // Use backend-calculated rank if available
+      if (auditData && auditData.ranking && auditData.ranking.localRank) {
+        return auditData.ranking.localRank
+      }
+
+      // Fallback: Calculate local rank based on rating only
       if (!auditData || !auditData.competitors) return 1
 
       const allRestaurants = [auditData.restaurant, ...auditData.competitors]
@@ -829,6 +1697,419 @@ export default {
       this.auditData = null
       this.mobileMenuOpen = false
       this.activeSection = 'dashboard'
+    },
+
+    getTopCompetitors(auditData) {
+      if (!auditData || !auditData.competitors) return []
+
+      let competitors = auditData.competitors.slice(0, 3)
+
+      // Apply search filter
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase()
+        competitors = competitors.filter(c =>
+          c.name?.toLowerCase().includes(query) ||
+          c.vicinity?.toLowerCase().includes(query)
+        )
+      }
+
+      return competitors
+    },
+
+    getTopIssues(auditData) {
+      if (!auditData || !auditData.seoIssues) return []
+
+      // Extract top 3 issues with revenue impact
+      let issues = auditData.seoIssues.slice(0, 3).map(issue => {
+        // Calculate impact based on issue severity
+        let impact = 0
+        if (issue.severity === 'high') impact = Math.floor((auditData.revenueImpact?.monthly || 0) * 0.3)
+        else if (issue.severity === 'medium') impact = Math.floor((auditData.revenueImpact?.monthly || 0) * 0.2)
+        else impact = Math.floor((auditData.revenueImpact?.monthly || 0) * 0.1)
+
+        return {
+          title: issue.title,
+          description: issue.description,
+          impact: impact
+        }
+      })
+
+      // Apply search filter
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase()
+        issues = issues.filter(issue =>
+          issue.title?.toLowerCase().includes(query) ||
+          issue.description?.toLowerCase().includes(query)
+        )
+      }
+
+      return issues
+    },
+
+    getDateRangeLabel() {
+      const range = this.dateRanges.find(r => r.value === this.selectedDateRange)
+      return range ? range.label : 'All Time'
+    },
+
+    getTopQuickWin(auditData) {
+      if (!auditData || !auditData.actionItems || auditData.actionItems.length === 0) {
+        return 'Add more photos'
+      }
+
+      // Find the easiest/quickest action item
+      const quickWin = auditData.actionItems.find(item =>
+        item.title?.toLowerCase().includes('photo') ||
+        item.title?.toLowerCase().includes('image') ||
+        item.title?.toLowerCase().includes('respond') ||
+        item.title?.toLowerCase().includes('hours')
+      )
+
+      return quickWin ? quickWin.title : auditData.actionItems[0]?.title || 'Add more photos'
+    },
+
+    getQuickWinRevenue(auditData) {
+      if (!auditData || !auditData.revenueImpact) return 0
+
+      // Quick wins typically represent 10-15% of potential revenue
+      const revenue = Math.floor((auditData.revenueImpact.monthly || 0) * 0.15)
+      return revenue.toLocaleString()
+    },
+
+    getTotalCheckedItems(auditData) {
+      if (!auditData) return 0
+      // Estimate total items checked (successful + failed)
+      const seoIssues = auditData.seoIssues?.length || 0
+      const actionItems = auditData.actionItems?.length || 0
+      // Assume we check about 3x more items than issues found (rough estimate)
+      return Math.ceil((seoIssues + actionItems) * 2.5)
+    },
+
+    extractCity(address) {
+      if (!address) return 'your area'
+      // Extract city from address (usually between first comma and second comma)
+      const parts = address.split(',')
+      if (parts.length >= 2) {
+        return parts[1].trim()
+      }
+      return address
+    },
+
+    getAllCompetitors(auditData) {
+      if (!auditData || !auditData.competitors) return []
+      // Return all competitors (limit to 10 for display)
+      return auditData.competitors.slice(0, 10)
+    },
+
+    getRankingColorClass(rank) {
+      if (rank === 1) return 'text-green-600'
+      if (rank === 2) return 'text-blue-600'
+      if (rank === 3) return 'text-orange-600'
+      if (rank <= 5) return 'text-yellow-600'
+      return 'text-gray-600'
+    },
+
+    getOrdinalSuffix(num) {
+      const j = num % 10
+      const k = num % 100
+      if (j === 1 && k !== 11) return 'st'
+      if (j === 2 && k !== 12) return 'nd'
+      if (j === 3 && k !== 13) return 'rd'
+      return 'th'
+    },
+
+    // Search Results checks
+    checkHeadlineKeywords(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if restaurant name includes cuisine type or location keywords
+      const name = auditData.restaurant.name?.toLowerCase() || ''
+      const types = auditData.restaurant.types || []
+      const address = auditData.restaurant.address?.toLowerCase() || ''
+
+      // Check if name includes cuisine type
+      const hasCuisineType = types.length > 0 && types.some(type =>
+        name.includes(type.toLowerCase())
+      )
+
+      // Check if name includes location
+      const cityMatch = address.match(/,\s*([^,]+)\s*,/)
+      const hasLocation = cityMatch && name.includes(cityMatch[1].toLowerCase())
+
+      return hasCuisineType || hasLocation
+    },
+
+    checkMetaDescription(auditData) {
+      if (!auditData) return true
+
+      // Check SEO issues for meta description problems
+      if (auditData.seoIssues) {
+        const hasMetaIssue = auditData.seoIssues.some(issue =>
+          issue.title?.toLowerCase().includes('meta') ||
+          issue.title?.toLowerCase().includes('description')
+        )
+        if (hasMetaIssue) return false
+      }
+
+      // Check if website exists and has good SEO score
+      return !!auditData.restaurant?.website && (auditData.metrics?.seo || 0) > 15
+    },
+
+    checkTitleTag(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if restaurant has address with city info
+      const address = auditData.restaurant.address || ''
+      const hasCityInAddress = address.split(',').length >= 2
+      return hasCityInAddress && address.length > 0
+    },
+
+    // Website Experience checks
+    checkMobileFriendly(auditData) {
+      if (!auditData) return false
+      // Check if website exists and has reasonable performance
+      const hasWebsite = !!auditData.restaurant?.website
+      const performance = auditData.metrics?.performance || 0
+      return hasWebsite && performance >= 25
+    },
+
+    checkPageSpeed(auditData) {
+      if (!auditData || !auditData.metrics) return false
+      // Check if performance score is good (above 60 is Google's "good" threshold)
+      const performance = auditData.metrics.performance || 0
+      return performance >= 30
+    },
+
+    checkDesign(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if website exists and no major design issues
+      const hasWebsite = !!auditData.restaurant.website
+      const hasGoodPerformance = (auditData.metrics?.performance || 0) > 20
+      return hasWebsite && hasGoodPerformance
+    },
+
+    checkNavigation(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if website exists with reasonable SEO (good navigation = good SEO)
+      const hasWebsite = !!auditData.restaurant.website
+      const hasSEO = (auditData.metrics?.seo || 0) > 10
+      return hasWebsite && hasSEO
+    },
+
+    // Local Listings checks
+    checkBusinessInfo(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if all essential Google Business Profile info is complete
+      const hasName = !!auditData.restaurant.name
+      const hasAddress = !!auditData.restaurant.address && auditData.restaurant.address.split(',').length >= 2
+      const hasPhone = !!auditData.restaurant.phone || !!auditData.restaurant.formatted_phone_number
+      const hasWebsite = !!auditData.restaurant.website
+
+      // At least 3 out of 4 should be present
+      const completedFields = [hasName, hasAddress, hasPhone, hasWebsite].filter(Boolean).length
+      return completedFields >= 3
+    },
+
+    checkPhotos(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if sufficient photos are uploaded (minimum 5 photos)
+      const photoCount = auditData.restaurant.photos?.length || 0
+      return photoCount >= 5
+    },
+
+    checkReviewResponses(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if restaurant has good reviews and rating (implies management)
+      const hasReviews = (auditData.restaurant.total_ratings || auditData.restaurant.user_ratings_total || 0) > 10
+      const goodRating = (auditData.restaurant.rating || 0) >= 4.0
+      return hasReviews && goodRating
+    },
+
+    checkBusinessHours(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if opening hours are set
+      return !!auditData.restaurant.opening_hours &&
+             (typeof auditData.restaurant.opening_hours === 'object' ||
+              auditData.restaurant.opening_hours === true)
+    },
+
+    scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    },
+
+    // Additional granular checks for Local Listings
+    checkFirstPartyWebsite(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      return !!auditData.restaurant.website && auditData.restaurant.website.length > 0
+    },
+
+    checkDescription(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      const description = auditData.restaurant.description || auditData.restaurant.editorial_summary?.overview || ''
+      return description.length >= 50 && description.length <= 750
+    },
+
+    checkPhoneNumber(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      const phone = auditData.restaurant.phone || auditData.restaurant.formatted_phone_number || auditData.restaurant.international_phone_number
+      return !!phone && phone.length > 0
+    },
+
+    checkPriceRange(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      const priceLevel = auditData.restaurant.price_level
+      return priceLevel !== null && priceLevel !== undefined && priceLevel >= 0
+    },
+
+    checkDescriptionKeywords(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      const description = (auditData.restaurant.description || auditData.restaurant.editorial_summary?.overview || '').toLowerCase()
+      const types = auditData.restaurant.types || []
+      const name = (auditData.restaurant.name || '').toLowerCase()
+
+      // Check if description includes cuisine type or restaurant keywords
+      const hasKeywords = types.some(type => description.includes(type.toLowerCase())) ||
+                         description.includes('restaurant') ||
+                         description.includes('dining') ||
+                         description.includes('cuisine') ||
+                         description.includes('food')
+
+      return description.length > 0 && hasKeywords
+    },
+
+    checkCategoryKeywords(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      const types = auditData.restaurant.types || []
+      const name = (auditData.restaurant.name || '').toLowerCase()
+
+      // Check if at least one category matches the business name
+      return types.length > 0 && types.some(type => {
+        const typeLower = type.toLowerCase()
+        return name.includes(typeLower) || typeLower.includes('restaurant') || typeLower.includes('food')
+      })
+    },
+
+    // Additional granular checks for Website Experience
+    checkWebsiteExists(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      return !!auditData.restaurant.website && auditData.restaurant.website.length > 0
+    },
+
+    checkOnlineOrdering(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if website exists (placeholder for actual online ordering detection)
+      const hasWebsite = !!auditData.restaurant.website
+      // In a real implementation, this would check the website for ordering systems
+      return hasWebsite && (auditData.metrics?.performance || 0) > 25
+    },
+
+    checkEffectiveCTAs(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if website exists and has good conversion potential
+      const hasWebsite = !!auditData.restaurant.website
+      const hasSEO = (auditData.metrics?.seo || 0) > 12
+      return hasWebsite && hasSEO
+    },
+
+    checkFavicon(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Placeholder check - in real implementation would check for favicon
+      const hasWebsite = !!auditData.restaurant.website
+      return hasWebsite && (auditData.metrics?.seo || 0) > 15
+    },
+
+    checkOrderingLinks(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if website exists (placeholder for actual ordering link detection)
+      const hasWebsite = !!auditData.restaurant.website
+      return hasWebsite && (auditData.metrics?.performance || 0) > 20
+    },
+
+    checkAboutUsSection(auditData) {
+      if (!auditData || !auditData.restaurant) return false
+      // Check if description/about section exists
+      const description = auditData.restaurant.description || auditData.restaurant.editorial_summary?.overview || ''
+      const hasWebsite = !!auditData.restaurant.website
+      return hasWebsite && description.length > 100
+    },
+
+    // Calculate accurate scores based on actual checks
+    calculateSearchResultsScore(auditData) {
+      if (!auditData) return 0
+      let score = 0
+      const maxScore = 40
+      const checksTotal = 3
+      const pointsPerCheck = maxScore / checksTotal
+
+      // Each passing check adds points
+      if (this.checkHeadlineKeywords(auditData)) score += pointsPerCheck
+      if (this.checkMetaDescription(auditData)) score += pointsPerCheck
+      if (this.checkTitleTag(auditData)) score += pointsPerCheck
+
+      return Math.round(score)
+    },
+
+    calculateWebsiteExperienceScore(auditData) {
+      if (!auditData) return 0
+      let score = 0
+      const maxScore = 40
+
+      // Total checks: 11 (1 Your site + 5 Content + 5 Appearance)
+      const checksTotal = 11
+      const pointsPerCheck = maxScore / checksTotal
+
+      // Your site checks (1)
+      if (this.checkWebsiteExists(auditData)) score += pointsPerCheck
+
+      // Content checks (5)
+      if (this.checkOnlineOrdering(auditData)) score += pointsPerCheck
+      if (this.checkEffectiveCTAs(auditData)) score += pointsPerCheck
+      if (this.checkPhoneNumber(auditData)) score += pointsPerCheck
+      if (this.checkFavicon(auditData)) score += pointsPerCheck
+      if (this.checkOrderingLinks(auditData)) score += pointsPerCheck
+
+      // Appearance checks (5)
+      if (this.checkAboutUsSection(auditData)) score += pointsPerCheck
+      if (this.checkDesign(auditData)) score += pointsPerCheck
+      if (this.checkMobileFriendly(auditData)) score += pointsPerCheck
+      if (this.checkPageSpeed(auditData)) score += pointsPerCheck
+      if (this.checkNavigation(auditData)) score += pointsPerCheck
+
+      return Math.round(score)
+    },
+
+    calculateLocalListingsScore(auditData) {
+      if (!auditData) return 0
+      let score = 0
+      const maxScore = 20
+
+      // Total checks: 9 (5 Profile content + 4 User-submitted content)
+      const checksTotal = 9
+      const pointsPerCheck = maxScore / checksTotal
+
+      // Profile content checks (5)
+      if (this.checkFirstPartyWebsite(auditData)) score += pointsPerCheck
+      if (this.checkDescription(auditData)) score += pointsPerCheck
+      if (this.checkBusinessHours(auditData)) score += pointsPerCheck
+      if (this.checkPhoneNumber(auditData)) score += pointsPerCheck
+      if (this.checkPriceRange(auditData)) score += pointsPerCheck
+
+      // User-submitted content checks (4)
+      if (this.checkDescriptionKeywords(auditData)) score += pointsPerCheck
+      if (this.checkCategoryKeywords(auditData)) score += pointsPerCheck
+      if (this.checkPhotos(auditData)) score += pointsPerCheck
+      if (this.checkReviewResponses(auditData)) score += pointsPerCheck
+
+      return Math.round(score)
+    },
+
+    getScoreStatus(score, maxScore) {
+      const percentage = (score / maxScore) * 100
+      if (percentage >= 80) return { label: 'Excellent', color: 'text-green-600' }
+      if (percentage >= 60) return { label: 'Good', color: 'text-blue-600' }
+      if (percentage >= 40) return { label: 'Fair', color: 'text-yellow-600' }
+      if (percentage >= 20) return { label: 'Poor', color: 'text-orange-600' }
+      return { label: 'Critical', color: 'text-red-600' }
     }
   }
 }

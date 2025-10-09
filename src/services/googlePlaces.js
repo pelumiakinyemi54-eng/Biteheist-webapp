@@ -159,6 +159,7 @@ class GooglePlacesService {
         reviews: audit.scores.reviews.score,
         responseTime: audit.scores.responseTime.score
       },
+      ranking: audit.ranking || {},  // Include ranking data from backend
       competitors: audit.competitors || [],
       seoIssues: this.transformSeoIssues(audit.scores.seo, audit.restaurant),
       pagespeed: {
