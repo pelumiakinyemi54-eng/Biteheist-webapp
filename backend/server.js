@@ -135,6 +135,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/branding', require('./routes/branding'));
+app.use('/api/leads', require('./routes/leads'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

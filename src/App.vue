@@ -1,6 +1,14 @@
 
 <template>
   <div id="app" class="bg-gray-50 min-h-screen">
+    <!-- Phone Gate Modal -->
+    <PhoneGateModal
+      v-if="auditData && auditData.restaurant"
+      :restaurantId="auditData.restaurant.placeId"
+      :restaurantName="auditData.restaurant.name"
+      @access-granted="onPhoneGateAccessGranted"
+    />
+
     <!-- Header -->
     <header class="bg-white border-b border-gray-100 py-4 no-print shadow-sm">
       <div class="container mx-auto px-4">
@@ -220,12 +228,12 @@
     <!-- Dashboard Content -->
     <main v-else-if="auditData && activeSection === 'dashboard'" class="container mx-auto px-4 py-8">
 
-      <!-- Two Column Layout -->
-      <div class="flex gap-8">
+      <!-- Two Column Layout - Stack on mobile, side-by-side on desktop -->
+      <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
-        <!-- Left Sidebar Score Card -->
-        <aside class="w-80 flex-shrink-0 sticky top-8 h-fit no-print">
-          <div class="card-shadow bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
+        <!-- Left Sidebar Score Card - Full width on mobile, fixed width on desktop -->
+        <aside class="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-8 h-fit no-print">
+          <div class="card-shadow bg-gradient-to-br from-blue-50 to-indigo-50 p-6 sm:p-8">
             <!-- Circular Score Gauge -->
             <div class="flex flex-col items-center mb-8">
               <div class="relative w-48 h-48">
@@ -380,9 +388,9 @@
         <!-- Main Content Column -->
         <div class="flex-1 min-w-0">
 
-      <!-- Floating Action Bar -->
-      <div class="fixed bottom-8 right-8 z-50 no-print">
-        <div class="flex flex-col space-y-3">
+      <!-- Floating Action Bar - Better mobile positioning -->
+      <div class="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 no-print">
+        <div class="flex flex-col space-y-2 sm:space-y-3">
           <button
             @click="exportPDF"
             class="floating-btn bg-blue-600 hover:bg-blue-700 group"
@@ -407,24 +415,24 @@
       </div>
 
       <!-- Restaurant Header Card -->
-      <div class="card-shadow mb-8">
-        <div class="flex items-start justify-between mb-4">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ auditData.restaurant.name }}</h1>
+      <div class="card-shadow mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row items-start sm:justify-between gap-3 mb-4">
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{{ auditData.restaurant.name }}</h1>
             <div class="flex items-center text-gray-600">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
-              <span class="text-sm">{{ auditData.restaurant.address }}</span>
+              <span class="text-sm break-words">{{ auditData.restaurant.address }}</span>
             </div>
           </div>
           <button
             v-if="auditData.restaurant.website"
-            class="btn-primary flex items-center space-x-2"
+            class="btn-primary flex items-center space-x-2 w-full sm:w-auto justify-center"
             @click="window.open(auditData.restaurant.website, '_blank')"
           >
-            <span>Visit Website</span>
+            <span class="text-xs sm:text-sm">Visit Website</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
             </svg>
@@ -433,10 +441,10 @@
 
         <!-- Summary Counter -->
         <div class="pt-4 border-t border-gray-200">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             We found {{ (auditData.seoIssues?.length || 0) + (auditData.actionItems?.length || 0) }} problems with your online presence
           </h2>
-          <p class="text-gray-600">
+          <p class="text-sm sm:text-base text-gray-600">
             {{ getTotalCheckedItems(auditData) }} things reviewed, {{ (auditData.seoIssues?.length || 0) + (auditData.actionItems?.length || 0) }} need work
           </p>
         </div>
@@ -516,34 +524,15 @@
         </div>
       </div>
 
-      <!-- Key Metrics (4 Hero Cards) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Google Rank -->
-        <div class="card-shadow text-center">
-          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Google Rank</div>
-          <div class="text-4xl font-bold text-blue-600 mb-1">
-            #{{ calculateGoogleRank(auditData) }}
-          </div>
-          <div class="text-sm text-gray-600 mb-2">
-            of {{ auditData.ranking?.totalCompetitors ? auditData.ranking.totalCompetitors + 1 : (auditData.competitors?.length + 1 || 1) }} restaurants
-          </div>
-          <div class="flex items-center justify-center text-xs">
-            <span class="text-green-600 font-semibold flex items-center">
-              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-              </svg>
-              +2 vs last week
-            </span>
-          </div>
-        </div>
-
+      <!-- Key Metrics (3 Hero Cards) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- Revenue Lost -->
         <div class="card-shadow text-center">
-          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Revenue Lost</div>
-          <div class="text-4xl font-bold text-red-600 mb-1">
+          <div class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Revenue Lost</div>
+          <div class="text-3xl sm:text-4xl font-bold text-red-600 mb-1">
             ${{ auditData.revenueImpact?.monthly?.toLocaleString() || '0' }}
           </div>
-          <div class="text-sm text-gray-600 mb-2">per month</div>
+          <div class="text-xs sm:text-sm text-gray-600 mb-2">per month</div>
           <div class="flex items-center justify-center text-xs">
             <span class="text-orange-600 font-semibold flex items-center">
               <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -556,11 +545,11 @@
 
         <!-- SEO Score -->
         <div class="card-shadow text-center">
-          <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">SEO Score</div>
-          <div class="text-4xl font-bold mb-1" :class="getScoreColorClass(auditData.overallScore)">
+          <div class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">SEO Score</div>
+          <div class="text-3xl sm:text-4xl font-bold mb-1" :class="getScoreColorClass(auditData.overallScore)">
             {{ auditData.overallScore }}/100
           </div>
-          <div class="text-sm text-gray-600 mb-2">{{ getScoreLabel(auditData.overallScore) }}</div>
+          <div class="text-xs sm:text-sm text-gray-600 mb-2">{{ getScoreLabel(auditData.overallScore) }}</div>
           <div class="flex items-center justify-center text-xs">
             <span class="text-green-600 font-semibold flex items-center">
               <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -573,102 +562,13 @@
 
         <!-- Quick Win -->
         <div class="card-shadow text-center bg-gradient-to-br from-green-50 to-emerald-50">
-          <div class="text-sm text-green-700 uppercase tracking-wide font-semibold mb-2">Quick Win</div>
-          <div class="text-lg font-bold text-green-800 mb-1">
+          <div class="text-xs sm:text-sm text-green-700 uppercase tracking-wide font-semibold mb-2">Quick Win</div>
+          <div class="text-base sm:text-lg font-bold text-green-800 mb-1 line-clamp-2">
             {{ getTopQuickWin(auditData) }}
           </div>
-          <div class="text-sm text-green-600 mb-2">Potential gain: +${{ getQuickWinRevenue(auditData) }}/mo</div>
+          <div class="text-xs sm:text-sm text-green-600 mb-2">Potential gain: +${{ getQuickWinRevenue(auditData) }}/mo</div>
           <div class="text-xs text-green-700 font-semibold">
             ⚡ Takes ~15 minutes
-          </div>
-        </div>
-      </div>
-
-      <!-- This is how you're doing online -->
-      <div class="card-shadow mb-8">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">This is how you're doing online</h2>
-          <p class="text-gray-600">Where you are showing up when customers search you, next to your competitors</p>
-        </div>
-
-        <!-- Search Query Rankings -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-4 flex-1">
-              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-              </svg>
-              <div class="flex-1">
-                <div class="font-medium text-gray-900">Best {{ (auditData.restaurant.types && auditData.restaurant.types[0]) || 'restaurant' }} in {{ extractCity(auditData.restaurant.address) }}</div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
-                🏆 #{{ calculateGoogleRank(auditData) }}: {{ auditData.competitors && auditData.competitors[0] ? auditData.competitors[0].name : 'Competitor' }}
-              </span>
-              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                Unranked map pack
-              </span>
-              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                Unranked organic
-              </span>
-              <button class="text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-4 flex-1">
-              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-              </svg>
-              <div class="flex-1">
-                <div class="font-medium text-gray-900">{{ auditData.restaurant.name }} near me</div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                #1: {{ auditData.restaurant.name }}
-              </span>
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                Ranked map pack
-              </span>
-              <button class="text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center space-x-4 flex-1">
-              <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-              </svg>
-              <div class="flex-1">
-                <div class="font-medium text-gray-900">Restaurants in {{ extractCity(auditData.restaurant.address) }}</div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
-                🏆 #1: {{ auditData.competitors && auditData.competitors[0] ? auditData.competitors[0].name : 'Competitor' }}
-              </span>
-              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                Unranked map pack
-              </span>
-              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                Unranked organic
-              </span>
-              <button class="text-gray-400 hover:text-gray-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -840,6 +740,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Online Presence Section: Keyword Rankings Across Cities -->
+      <OnlinePresenceSection
+        v-if="auditData && auditData.restaurant"
+        :restaurantData="auditData.restaurant"
+      />
 
       <!-- Website Experience: Guest Experience & Appearance -->
       <div id="website-experience-section" class="card-shadow mb-8">
@@ -1338,6 +1244,8 @@ import TrafficAnalytics from './components/TrafficAnalytics.vue'
 import WeeklyReportView from './components/WeeklyReportView.vue'
 import NewMultiRestaurant from './components/NewMultiRestaurant.vue'
 import ReportsSection from './components/ReportsSection.vue'
+import PhoneGateModal from './components/PhoneGateModal.vue'
+import OnlinePresenceSection from './components/OnlinePresenceSection.vue'
 import googlePlacesService from './services/googlePlaces.js'
 
 export default {
@@ -1358,7 +1266,9 @@ export default {
     TrafficAnalytics,
     WeeklyReportView,
     NewMultiRestaurant,
-    ReportsSection
+    ReportsSection,
+    PhoneGateModal,
+    OnlinePresenceSection
   },
   data() {
     return {
@@ -1392,6 +1302,12 @@ export default {
     }
   },
   methods: {
+    onPhoneGateAccessGranted() {
+      // Phone gate access has been granted
+      // The modal will hide itself automatically
+      console.log('Phone gate access granted');
+    },
+
     async handleRunAudit(place) {
       if (!place) return
 
@@ -2138,13 +2054,26 @@ export default {
   background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
 }
 
-/* Card Styling */
+/* Card Styling - Responsive padding */
 .card-shadow {
   background: white;
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 12px;
+  padding: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 30px -10px rgba(0,0,0,0.08);
   border: 1px solid rgba(0,0,0,0.03);
+}
+
+@media (min-width: 640px) {
+  .card-shadow {
+    border-radius: 16px;
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-shadow {
+    padding: 32px;
+  }
 }
 
 /* Revenue Numbers */
@@ -2348,10 +2277,10 @@ export default {
   opacity: 0;
 }
 
-/* Floating Action Buttons */
+/* Floating Action Buttons - Responsive sizing */
 .floating-btn {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   color: white;
   display: flex;
@@ -2362,6 +2291,13 @@ export default {
   border: none;
   cursor: pointer;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .floating-btn {
+    width: 56px;
+    height: 56px;
+  }
 }
 
 .floating-btn:hover {

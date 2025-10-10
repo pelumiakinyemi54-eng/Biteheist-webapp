@@ -274,6 +274,7 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
     let competitors = [];
     if (restaurant.location) {
       try {
+        // First attempt: 10km radius
         competitors = await googlePlaces.findNearbyCompetitors(
           restaurant.location.lat,
           restaurant.location.lng,
@@ -283,6 +284,38 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
             restaurantTypes: restaurant.types || []
           }
         );
+
+        // Fallback: If no competitors found, expand search radius to 25km
+        if (competitors.length === 0) {
+          winston.info(`No competitors found in 10km, expanding to 25km radius`);
+          competitors = await googlePlaces.findNearbyCompetitors(
+            restaurant.location.lat,
+            restaurant.location.lng,
+            {
+              radius: 25000,  // 25km radius
+              maxResults: 20,
+              restaurantTypes: restaurant.types || []
+            }
+          );
+        }
+
+        // Second fallback: If still no competitors, try 50km without food type filtering
+        if (competitors.length === 0) {
+          winston.info(`No competitors found in 25km, expanding to 50km radius without strict filtering`);
+          competitors = await googlePlaces.findNearbyCompetitors(
+            restaurant.location.lat,
+            restaurant.location.lng,
+            {
+              radius: 50000,  // 50km radius
+              maxResults: 10,
+              restaurantTypes: [] // Remove type filtering to get any restaurants
+            }
+          );
+        }
+
+        if (competitors.length === 0) {
+          winston.warn(`No competitors found even after expanding search to 50km`);
+        }
       } catch (error) {
         winston.warn(`Competitor search failed: ${error.message}`);
       }
@@ -738,5 +771,143 @@ async function saveAnalyticsSnapshots(restaurant, auditResult, competitors) {
     throw error;
   }
 }
+
+/**
+ * @route   POST /api/restaurants/keyword-ranking
+ * @desc    Get keyword ranking across multiple cities
+ * @access  Public
+ */
+router.post('/keyword-ranking', optionalAuth, async (req, res) => {
+  try {
+    const { placeId, restaurantName, cuisine, city, lat, lng } = req.body;
+
+    // Validate required fields
+    if (!placeId || !cuisine || !city) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: placeId, cuisine, and city are required'
+      });
+    }
+
+    winston.info(`Keyword ranking search: ${cuisine} in ${city} for ${restaurantName || placeId}`);
+
+    const { getSurroundingCities, getSearchVariations } = require('../utils/locationHelper');
+
+    // Get surrounding cities if lat/lng provided
+    let cities = [{ name: city, distance: 0 }];
+    if (lat && lng) {
+      const surroundingCities = await getSurroundingCities(lat, lng, 25, 5);
+      cities = [{ name: city, distance: 0 }, ...surroundingCities];
+    }
+
+    // Generate search variations
+    const keywords = [
+      `${cuisine}`,
+      `${cuisine} restaurant`,
+      `best ${cuisine}`,
+      `top ${cuisine}`
+    ];
+
+    const rankings = [];
+    const allCompetitors = new Map(); // Track unique competitors across all searches
+
+    // Search each city/keyword combination
+    for (const cityObj of cities) {
+      for (const keyword of keywords) {
+        try {
+          const searchQuery = `${keyword} in ${cityObj.name}`;
+
+          // Search for restaurants with this keyword
+          const results = await googlePlaces.searchRestaurants(searchQuery, {
+            maxResults: 20,
+            location: lat && lng ? { latitude: lat, longitude: lng } : undefined
+          });
+
+          // Find target restaurant position
+          const position = results.findIndex(r => r.placeId === placeId) + 1;
+
+          // Track top 3 competitors
+          const topThree = results.slice(0, 3).filter(r => r.placeId !== placeId);
+          topThree.forEach(comp => {
+            if (!allCompetitors.has(comp.placeId)) {
+              allCompetitors.set(comp.placeId, {
+                ...comp,
+                appearances: 1
+              });
+            } else {
+              allCompetitors.get(comp.placeId).appearances++;
+            }
+          });
+
+          rankings.push({
+            keyword: searchQuery,
+            city: cityObj.name,
+            distance: cityObj.distance,
+            position: position || null,
+            inTopTwenty: position > 0 && position <= 20,
+            topCompetitors: topThree.map(c => ({
+              placeId: c.placeId,
+              name: c.name,
+              rating: c.rating,
+              totalRatings: c.totalRatings
+            }))
+          });
+
+        } catch (error) {
+          winston.error(`Keyword search failed for ${keyword} in ${cityObj.name}: ${error.message}`);
+        }
+      }
+    }
+
+    // Sort competitors by appearance frequency
+    const topCompetitors = Array.from(allCompetitors.values())
+      .sort((a, b) => b.appearances - a.appearances)
+      .slice(0, 3)
+      .map(comp => ({
+        placeId: comp.placeId,
+        name: comp.name,
+        rating: comp.rating,
+        totalRatings: comp.totalRatings,
+        appearances: comp.appearances
+      }));
+
+    // Calculate summary statistics
+    const positionsFound = rankings.filter(r => r.position).map(r => r.position);
+    const avgPosition = positionsFound.length > 0
+      ? Math.round(positionsFound.reduce((a, b) => a + b, 0) / positionsFound.length)
+      : null;
+
+    const inTopTen = rankings.filter(r => r.position && r.position <= 10).length;
+    const inTopTwenty = rankings.filter(r => r.position && r.position <= 20).length;
+    const notRanked = rankings.filter(r => !r.position).length;
+
+    res.json({
+      success: true,
+      summary: {
+        avgPosition,
+        inTopTen,
+        inTopTwenty,
+        notRanked,
+        totalSearches: rankings.length
+      },
+      rankings: rankings.sort((a, b) => {
+        // Sort by: in top 20 first, then by position, then by distance
+        if (a.inTopTwenty && !b.inTopTwenty) return -1;
+        if (!a.inTopTwenty && b.inTopTwenty) return 1;
+        if (a.position && b.position) return a.position - b.position;
+        return a.distance - b.distance;
+      }),
+      topCompetitors
+    });
+
+  } catch (error) {
+    winston.error(`Keyword ranking error: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: 'Keyword ranking search failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
 
 module.exports = router;
