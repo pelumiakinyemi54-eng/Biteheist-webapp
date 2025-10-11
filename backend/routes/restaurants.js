@@ -974,25 +974,65 @@ function generateCuisineSpecificKeywords(cuisine) {
   // Extract base cuisine type (e.g., "Mexican food" -> "mexican")
   const baseCuisine = cuisine.toLowerCase().replace(' food', '').replace(' restaurant', '').trim();
 
-  // Cuisine-specific dishes and search terms
+  // Cuisine-specific dishes and search terms organized by category
   const cuisineSpecificTerms = {
+    // CUISINE TYPES
     'mexican': ['tacos', 'burritos', 'quesadillas', 'enchiladas', 'mexican restaurant'],
     'italian': ['pizza', 'pasta', 'italian restaurant', 'lasagna', 'spaghetti'],
     'chinese': ['chinese food', 'dim sum', 'fried rice', 'chinese restaurant', 'noodles'],
     'japanese': ['sushi', 'ramen', 'japanese restaurant', 'hibachi', 'teriyaki'],
     'thai': ['thai food', 'pad thai', 'curry', 'thai restaurant', 'noodles'],
     'indian': ['indian food', 'curry', 'biryani', 'indian restaurant', 'tikka'],
-    'american': ['burgers', 'american food', 'steakhouse', 'bbq', 'american restaurant'],
     'french': ['french restaurant', 'french cuisine', 'bistro', 'french food'],
-    'pizza': ['pizza', 'pizza restaurant', 'pizzeria', 'pizza delivery', 'best pizza'],
-    'sushi': ['sushi', 'sushi restaurant', 'japanese food', 'sushi bar', 'sashimi'],
-    'seafood': ['seafood restaurant', 'seafood', 'fish restaurant', 'lobster', 'crab'],
-    'steakhouse': ['steakhouse', 'steak restaurant', 'steaks', 'bbq', 'grill'],
-    'cafe': ['cafe', 'coffee shop', 'breakfast', 'brunch', 'bakery'],
-    'fast food': ['fast food', 'quick service', 'burgers', 'chicken'],
     'vietnamese': ['vietnamese food', 'pho', 'banh mi', 'vietnamese restaurant'],
     'korean': ['korean bbq', 'korean food', 'korean restaurant', 'bibimbap'],
-    'mediterranean': ['mediterranean food', 'gyros', 'falafel', 'mediterranean restaurant', 'kebab']
+    'mediterranean': ['mediterranean food', 'gyros', 'falafel', 'mediterranean restaurant', 'kebab'],
+    'greek': ['greek food', 'gyros', 'souvlaki', 'greek restaurant', 'mediterranean'],
+    'middle eastern': ['middle eastern food', 'shawarma', 'falafel', 'kebab', 'hummus'],
+    'spanish': ['tapas', 'paella', 'spanish restaurant', 'spanish food'],
+    'brazilian': ['brazilian steakhouse', 'churrascaria', 'brazilian food', 'bbq'],
+    'german': ['german food', 'schnitzel', 'bratwurst', 'german restaurant', 'beer garden'],
+
+    // FOOD CATEGORIES
+    'pizza': ['pizza', 'pizza restaurant', 'pizzeria', 'pizza delivery', 'best pizza'],
+    'sushi': ['sushi', 'sushi restaurant', 'japanese food', 'sushi bar', 'sashimi'],
+    'burger': ['burgers', 'burger joint', 'hamburgers', 'cheeseburgers', 'burger restaurant'],
+    'sandwich': ['sandwiches', 'sandwich shop', 'deli', 'subs', 'hoagies'],
+    'bbq': ['bbq', 'barbecue', 'ribs', 'brisket', 'bbq restaurant'],
+    'seafood': ['seafood restaurant', 'seafood', 'fish restaurant', 'lobster', 'crab'],
+    'wings': ['chicken wings', 'buffalo wings', 'wing restaurant', 'sports bar'],
+    'chicken': ['fried chicken', 'chicken restaurant', 'rotisserie chicken', 'chicken tenders'],
+
+    // DINING CATEGORIES
+    'steakhouse': ['steakhouse', 'steak restaurant', 'steaks', 'prime rib', 'fine dining'],
+    'cafe': ['cafe', 'coffee shop', 'breakfast', 'brunch', 'bakery'],
+    'diner': ['diner', 'breakfast', 'pancakes', 'comfort food', 'all day breakfast'],
+    'buffet': ['buffet', 'all you can eat', 'buffet restaurant', 'dinner buffet'],
+    'food truck': ['food truck', 'street food', 'mobile food', 'food cart'],
+
+    // FAST FOOD & CHAINS
+    'fast food': ['fast food', 'quick service', 'drive thru', 'fast casual'],
+    'fast casual': ['fast casual', 'quick service restaurant', 'counter service'],
+    'chain restaurant': ['chain restaurant', 'family restaurant', 'casual dining'],
+
+    // SPECIALTY
+    'vegetarian': ['vegetarian restaurant', 'vegan food', 'plant based', 'healthy food'],
+    'vegan': ['vegan restaurant', 'plant based', 'vegan food', 'vegetarian'],
+    'organic': ['organic restaurant', 'farm to table', 'organic food', 'healthy dining'],
+    'gluten free': ['gluten free restaurant', 'celiac friendly', 'gluten free dining'],
+    'bakery': ['bakery', 'pastries', 'bread', 'desserts', 'cakes'],
+    'dessert': ['dessert shop', 'ice cream', 'sweets', 'bakery', 'pastries'],
+    'ice cream': ['ice cream shop', 'gelato', 'frozen yogurt', 'ice cream'],
+    'juice bar': ['juice bar', 'smoothies', 'healthy drinks', 'fresh juice'],
+    'bar': ['bar', 'sports bar', 'pub', 'bar and grill', 'drinks'],
+    'brewery': ['brewery', 'craft beer', 'brewpub', 'beer garden'],
+    'wine bar': ['wine bar', 'wine restaurant', 'wine tasting', 'wine lounge'],
+
+    // AMERICAN SUBCATEGORIES
+    'american': ['american food', 'american restaurant', 'burgers', 'steaks', 'diner'],
+    'southern': ['southern food', 'soul food', 'comfort food', 'southern restaurant', 'fried chicken'],
+    'cajun': ['cajun food', 'creole', 'cajun restaurant', 'gumbo', 'jambalaya'],
+    'tex-mex': ['tex mex', 'fajitas', 'nachos', 'tex mex restaurant']
   };
 
   // Get specific terms for this cuisine, or use generic terms
@@ -1005,7 +1045,7 @@ function generateCuisineSpecificKeywords(cuisine) {
   // Generate final keywords with variations
   const keywords = [];
 
-  // Add the most specific terms (dishes)
+  // Add the most specific terms (dishes/categories)
   specificTerms.slice(0, 3).forEach(term => {
     keywords.push(term);
     keywords.push(`best ${term}`);
