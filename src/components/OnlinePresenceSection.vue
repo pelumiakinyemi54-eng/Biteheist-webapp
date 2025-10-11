@@ -172,7 +172,6 @@
             </div>
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-900">{{ problem.issue }}</p>
-              <p class="text-xs text-red-700 mt-1">Costing ~${{ problem.monthlyCost }}/month</p>
             </div>
           </div>
         </div>
