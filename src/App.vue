@@ -524,25 +524,8 @@
         </div>
       </div>
 
-      <!-- Key Metrics (3 Hero Cards) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <!-- Revenue Lost -->
-        <div class="card-shadow text-center">
-          <div class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">Revenue Lost</div>
-          <div class="text-3xl sm:text-4xl font-bold text-red-600 mb-1">
-            ${{ auditData.revenueImpact?.monthly?.toLocaleString() || '0' }}
-          </div>
-          <div class="text-xs sm:text-sm text-gray-600 mb-2">per month</div>
-          <div class="flex items-center justify-center text-xs">
-            <span class="text-orange-600 font-semibold flex items-center">
-              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-              </svg>
-              +8% vs last month
-            </span>
-          </div>
-        </div>
-
+      <!-- Key Metrics (2 Hero Cards) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- SEO Score -->
         <div class="card-shadow text-center">
           <div class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide font-semibold mb-2">SEO Score</div>
@@ -573,64 +556,11 @@
         </div>
       </div>
 
-
-      <!-- Top 3 Issues to Fix -->
-      <div class="card-shadow mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Top Issues to Fix</h2>
-
-        <!-- Empty State -->
-        <div v-if="getTopIssues(auditData).length === 0" class="text-center py-12">
-          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <p class="text-gray-500">No issues found matching your search</p>
-          <button @click="searchQuery = ''" class="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
-            Clear search
-          </button>
-        </div>
-
-        <!-- Issues List -->
-        <div v-else class="space-y-4">
-          <div
-            v-for="(issue, index) in getTopIssues(auditData)"
-            :key="index"
-            class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
-          >
-            <div class="flex-shrink-0 w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center font-bold">
-              {{ index + 1 }}
-            </div>
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900 mb-1">{{ issue.title }}</h3>
-              <p class="text-sm text-gray-600">{{ issue.description }}</p>
-            </div>
-            <div class="text-right flex items-start space-x-4">
-              <div>
-                <div class="text-sm text-gray-500">Impact</div>
-                <div class="font-bold text-red-600">+${{ issue.impact }}/mo</div>
-              </div>
-              <!-- Action Icons -->
-              <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  class="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                  title="View Solution"
-                >
-                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </button>
-                <button
-                  class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                  title="Dismiss"
-                >
-                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Online Presence Section: Keyword Rankings Across Cities -->
+      <OnlinePresenceSection
+        v-if="auditData && auditData.restaurant"
+        :restaurantData="auditData.restaurant"
+      />
 
       <!-- Search Results: Headline & Metadata -->
       <div id="search-results-section" class="card-shadow mb-8">
@@ -693,12 +623,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Online Presence Section: Keyword Rankings Across Cities -->
-      <OnlinePresenceSection
-        v-if="auditData && auditData.restaurant"
-        :restaurantData="auditData.restaurant"
-      />
 
       <!-- Website Experience: Guest Experience & Appearance -->
       <div id="website-experience-section" class="card-shadow mb-8">
