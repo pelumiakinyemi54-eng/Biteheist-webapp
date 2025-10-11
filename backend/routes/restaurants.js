@@ -631,14 +631,61 @@ function generateActionItems(seoScore, pageSpeedScore, restaurant, competitors, 
       const totalRestaurants = analysis.similarRestaurants || competitors.length + 1;
       const percentile = Math.round(((totalRestaurants - googleRank) / totalRestaurants) * 100);
 
+      // Main visibility issue
       items.push({
         priority: 'high',
         category: 'Search Visibility',
         title: 'Poor search visibility across regions',
-        description: `Your restaurant ranks #${googleRank} out of ${totalRestaurants} similar restaurants in your area (${percentile}th percentile). Customers searching for your cuisine type are finding competitors first. Improving your Google Business Profile, SEO, and local presence can move you into the top 10 where most customers make their choice.`,
+        description: `Your restaurant ranks #${googleRank} out of ${totalRestaurants} similar ${restaurant.types?.[0]?.replace(/_/g, ' ')} restaurants in your area (${percentile}th percentile). Customers searching for your cuisine type are finding competitors first.`,
         estimatedRevenue: 2000,
-        timeframe: '6-12 weeks'
+        timeframe: '6-12 weeks',
+        actionItems: [
+          'Complete your Google Business Profile with accurate hours, menu, and services',
+          'Post weekly updates on Google Business (photos, offers, events)',
+          'Respond to ALL customer reviews within 24 hours',
+          'Add more high-quality photos (at least 20+ food, ambiance, exterior)',
+          'Use location-specific keywords in your business description',
+          'Ensure your website is mobile-friendly and loads quickly'
+        ]
       });
+
+      // Specific SEO actions
+      if (!restaurant.website) {
+        items.push({
+          priority: 'high',
+          category: 'Search Visibility',
+          title: 'Missing website hurting search rankings',
+          description: 'Restaurants with professional websites rank 3-5 positions higher on average. Without a website, you\'re invisible to customers searching online.',
+          estimatedRevenue: 1500,
+          timeframe: '2-4 weeks',
+          actionItems: [
+            'Create a mobile-responsive website with your menu',
+            'Add location pages with your address and map',
+            'Include customer reviews and testimonials',
+            'Set up local SEO with city/neighborhood keywords',
+            'Submit your website to Google Search Console'
+          ]
+        });
+      }
+
+      if (restaurant.totalRatings < 50) {
+        items.push({
+          priority: 'high',
+          category: 'Search Visibility',
+          title: 'Low review count impacting search position',
+          description: `With only ${restaurant.totalRatings} reviews, you need at least 50+ to compete effectively. More reviews = higher rankings and more trust.`,
+          estimatedRevenue: 800,
+          timeframe: '4-8 weeks',
+          actionItems: [
+            'Ask every satisfied customer for a Google review',
+            'Add QR codes on receipts linking directly to your review page',
+            'Send follow-up emails/texts to customers after their visit',
+            'Train staff to mention "please leave us a review" at checkout',
+            'Respond to every review to encourage more customers to review'
+          ]
+        });
+      }
+
     } else if (googleRank > 5) {
       // Medium priority if ranking is 6-10 (still room for improvement)
       items.push({
@@ -647,7 +694,14 @@ function generateActionItems(seoScore, pageSpeedScore, restaurant, competitors, 
         title: 'Opportunity to improve search ranking',
         description: `You rank #${googleRank} among similar restaurants. Moving into the top 5 results can significantly increase customer discovery and foot traffic.`,
         estimatedRevenue: 1200,
-        timeframe: '4-8 weeks'
+        timeframe: '4-8 weeks',
+        actionItems: [
+          'Post updates on Google Business 2-3 times per week',
+          'Respond to all reviews within 24 hours',
+          'Add more photos showcasing your best dishes',
+          'Update your business hours and services regularly',
+          'Use relevant keywords in your business description'
+        ]
       });
     }
   }

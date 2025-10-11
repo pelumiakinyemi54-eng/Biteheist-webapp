@@ -573,9 +573,10 @@
         </div>
       </div>
 
-      <!-- Who's Beating You on Google -->
+      <!-- Top Competitors in Your Market -->
       <div class="card-shadow mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Who's beating you on Google</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Top Competitors in Your Market</h2>
+        <p class="text-sm text-gray-600 mb-4">These are restaurants in your area serving the same cuisine type as you</p>
 
         <!-- Empty State -->
         <div v-if="getTopCompetitors(auditData).length === 0" class="text-center py-12">
