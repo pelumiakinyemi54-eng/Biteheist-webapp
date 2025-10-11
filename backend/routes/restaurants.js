@@ -968,95 +968,111 @@ function detectSearchVisibilityProblems(restaurant, rankings, avgPosition) {
 }
 
 /**
- * Generate cuisine-specific keywords for search ranking
+ * Generate HIGHLY SPECIFIC cuisine keywords (like owner.com)
  */
 function generateCuisineSpecificKeywords(cuisine) {
   // Extract base cuisine type (e.g., "Mexican food" -> "mexican")
   const baseCuisine = cuisine.toLowerCase().replace(' food', '').replace(' restaurant', '').trim();
 
-  // Cuisine-specific dishes and search terms organized by category
+  // HIGHLY SPECIFIC dishes and menu items organized by cuisine
   const cuisineSpecificTerms = {
-    // CUISINE TYPES
-    'mexican': ['tacos', 'burritos', 'quesadillas', 'enchiladas', 'mexican restaurant'],
-    'italian': ['pizza', 'pasta', 'italian restaurant', 'lasagna', 'spaghetti'],
-    'chinese': ['chinese food', 'dim sum', 'fried rice', 'chinese restaurant', 'noodles'],
-    'japanese': ['sushi', 'ramen', 'japanese restaurant', 'hibachi', 'teriyaki'],
-    'thai': ['thai food', 'pad thai', 'curry', 'thai restaurant', 'noodles'],
-    'indian': ['indian food', 'curry', 'biryani', 'indian restaurant', 'tikka'],
-    'french': ['french restaurant', 'french cuisine', 'bistro', 'french food'],
-    'vietnamese': ['vietnamese food', 'pho', 'banh mi', 'vietnamese restaurant'],
-    'korean': ['korean bbq', 'korean food', 'korean restaurant', 'bibimbap'],
-    'mediterranean': ['mediterranean food', 'gyros', 'falafel', 'mediterranean restaurant', 'kebab'],
-    'greek': ['greek food', 'gyros', 'souvlaki', 'greek restaurant', 'mediterranean'],
-    'middle eastern': ['middle eastern food', 'shawarma', 'falafel', 'kebab', 'hummus'],
-    'spanish': ['tapas', 'paella', 'spanish restaurant', 'spanish food'],
-    'brazilian': ['brazilian steakhouse', 'churrascaria', 'brazilian food', 'bbq'],
-    'german': ['german food', 'schnitzel', 'bratwurst', 'german restaurant', 'beer garden'],
+    // MEXICAN - Specific dishes
+    'mexican': ['tacos', 'burritos', 'quesadillas', 'nachos', 'fajitas', 'guacamole'],
 
-    // FOOD CATEGORIES
-    'pizza': ['pizza', 'pizza restaurant', 'pizzeria', 'pizza delivery', 'best pizza'],
-    'sushi': ['sushi', 'sushi restaurant', 'japanese food', 'sushi bar', 'sashimi'],
-    'burger': ['burgers', 'burger joint', 'hamburgers', 'cheeseburgers', 'burger restaurant'],
-    'sandwich': ['sandwiches', 'sandwich shop', 'deli', 'subs', 'hoagies'],
-    'bbq': ['bbq', 'barbecue', 'ribs', 'brisket', 'bbq restaurant'],
-    'seafood': ['seafood restaurant', 'seafood', 'fish restaurant', 'lobster', 'crab'],
-    'wings': ['chicken wings', 'buffalo wings', 'wing restaurant', 'sports bar'],
-    'chicken': ['fried chicken', 'chicken restaurant', 'rotisserie chicken', 'chicken tenders'],
+    // ITALIAN - Specific dishes
+    'italian': ['pizza', 'pasta', 'lasagna', 'spaghetti', 'ravioli', 'tiramisu'],
 
-    // DINING CATEGORIES
-    'steakhouse': ['steakhouse', 'steak restaurant', 'steaks', 'prime rib', 'fine dining'],
-    'cafe': ['cafe', 'coffee shop', 'breakfast', 'brunch', 'bakery'],
-    'diner': ['diner', 'breakfast', 'pancakes', 'comfort food', 'all day breakfast'],
-    'buffet': ['buffet', 'all you can eat', 'buffet restaurant', 'dinner buffet'],
-    'food truck': ['food truck', 'street food', 'mobile food', 'food cart'],
+    // CHINESE - Specific dishes
+    'chinese': ['fried rice', 'orange chicken', 'lo mein', 'dumplings', 'spring rolls', 'wonton soup'],
 
-    // FAST FOOD & CHAINS
-    'fast food': ['fast food', 'quick service', 'drive thru', 'fast casual'],
-    'fast casual': ['fast casual', 'quick service restaurant', 'counter service'],
-    'chain restaurant': ['chain restaurant', 'family restaurant', 'casual dining'],
+    // JAPANESE - Specific dishes
+    'japanese': ['sushi', 'ramen', 'tempura', 'teriyaki', 'udon', 'edamame'],
 
-    // SPECIALTY
-    'vegetarian': ['vegetarian restaurant', 'vegan food', 'plant based', 'healthy food'],
-    'vegan': ['vegan restaurant', 'plant based', 'vegan food', 'vegetarian'],
-    'organic': ['organic restaurant', 'farm to table', 'organic food', 'healthy dining'],
-    'gluten free': ['gluten free restaurant', 'celiac friendly', 'gluten free dining'],
-    'bakery': ['bakery', 'pastries', 'bread', 'desserts', 'cakes'],
-    'dessert': ['dessert shop', 'ice cream', 'sweets', 'bakery', 'pastries'],
-    'ice cream': ['ice cream shop', 'gelato', 'frozen yogurt', 'ice cream'],
-    'juice bar': ['juice bar', 'smoothies', 'healthy drinks', 'fresh juice'],
-    'bar': ['bar', 'sports bar', 'pub', 'bar and grill', 'drinks'],
-    'brewery': ['brewery', 'craft beer', 'brewpub', 'beer garden'],
-    'wine bar': ['wine bar', 'wine restaurant', 'wine tasting', 'wine lounge'],
+    // THAI - Specific dishes
+    'thai': ['pad thai', 'green curry', 'tom yum', 'spring rolls', 'mango sticky rice'],
 
-    // AMERICAN SUBCATEGORIES
-    'american': ['american food', 'american restaurant', 'burgers', 'steaks', 'diner'],
-    'southern': ['southern food', 'soul food', 'comfort food', 'southern restaurant', 'fried chicken'],
-    'cajun': ['cajun food', 'creole', 'cajun restaurant', 'gumbo', 'jambalaya'],
-    'tex-mex': ['tex mex', 'fajitas', 'nachos', 'tex mex restaurant']
+    // INDIAN - Specific dishes
+    'indian': ['butter chicken', 'tikka masala', 'biryani', 'naan', 'samosas', 'curry'],
+
+    // AMERICAN/DINER - Specific dishes
+    'american': ['bacon and eggs', 'pancakes', 'waffles', 'french toast', 'omelette', 'hash browns'],
+    'diner': ['bacon and eggs', 'pancakes', 'waffles', 'french toast', 'burgers', 'milkshakes'],
+
+    // FAST FOOD - Specific items
+    'fast food': ['burgers', 'fries', 'chicken nuggets', 'milkshakes', 'onion rings', 'cheeseburgers'],
+
+    // CAFE/BREAKFAST - Specific items
+    'cafe': ['avocado toast', 'eggs benedict', 'breakfast sandwich', 'croissant', 'latte', 'cappuccino'],
+
+    // PIZZA - Specific types
+    'pizza': ['pepperoni pizza', 'margherita pizza', 'meat lovers pizza', 'veggie pizza', 'cheese pizza'],
+
+    // SUSHI - Specific types
+    'sushi': ['california roll', 'spicy tuna roll', 'salmon sashimi', 'rainbow roll', 'nigiri'],
+
+    // BURGER - Specific types
+    'burger': ['cheeseburgers', 'bacon burgers', 'veggie burgers', 'double burgers', 'burger and fries'],
+
+    // BBQ - Specific items
+    'bbq': ['ribs', 'brisket', 'pulled pork', 'bbq chicken', 'smoked meat', 'bbq sauce'],
+
+    // STEAKHOUSE - Specific cuts
+    'steakhouse': ['ribeye steak', 'filet mignon', 'new york strip', 'prime rib', 't-bone steak'],
+
+    // SEAFOOD - Specific dishes
+    'seafood': ['fish and chips', 'lobster roll', 'crab cakes', 'shrimp scampi', 'grilled salmon'],
+
+    // CHICKEN - Specific preparations
+    'chicken': ['fried chicken', 'chicken tenders', 'buffalo wings', 'grilled chicken', 'rotisserie chicken'],
+
+    // SANDWICH/DELI - Specific types
+    'sandwich': ['club sandwich', 'BLT', 'philly cheesesteak', 'panini', 'sub sandwich', 'grilled cheese'],
+
+    // BAKERY - Specific items
+    'bakery': ['croissants', 'bagels', 'muffins', 'donuts', 'cinnamon rolls', 'danish pastry'],
+
+    // ICE CREAM - Specific flavors/types
+    'ice cream': ['vanilla ice cream', 'chocolate ice cream', 'ice cream sundae', 'milkshake', 'banana split'],
+
+    // WINGS - Specific types
+    'wings': ['buffalo wings', 'bbq wings', 'garlic wings', 'hot wings', 'boneless wings'],
+
+    // SOUTHERN - Specific dishes
+    'southern': ['fried chicken', 'mac and cheese', 'collard greens', 'cornbread', 'biscuits and gravy'],
+
+    // MEDITERRANEAN/GREEK - Specific dishes
+    'mediterranean': ['gyros', 'falafel', 'hummus', 'shawarma', 'greek salad', 'kebab'],
+    'greek': ['gyros', 'souvlaki', 'greek salad', 'tzatziki', 'spanakopita', 'baklava'],
+
+    // MIDDLE EASTERN - Specific dishes
+    'middle eastern': ['shawarma', 'falafel', 'hummus', 'kebab', 'pita bread', 'tahini'],
+
+    // VIETNAMESE - Specific dishes
+    'vietnamese': ['pho', 'banh mi', 'spring rolls', 'vermicelli bowl', 'vietnamese coffee'],
+
+    // KOREAN - Specific dishes
+    'korean': ['korean bbq', 'bibimbap', 'kimchi', 'bulgogi', 'korean fried chicken'],
+
+    // TEX-MEX - Specific dishes
+    'tex-mex': ['fajitas', 'nachos', 'queso', 'chimichanga', 'tex mex burrito']
   };
 
   // Get specific terms for this cuisine, or use generic terms
   let specificTerms = cuisineSpecificTerms[baseCuisine] || [
-    `${cuisine}`,
-    `${cuisine} restaurant`,
-    `${baseCuisine} food`
+    `${baseCuisine} food`,
+    `${baseCuisine} restaurant`,
+    `${baseCuisine} dishes`
   ];
 
-  // Generate final keywords with variations
+  // Generate final keywords - ALL with "best" prefix for specificity
   const keywords = [];
 
-  // Add the most specific terms (dishes/categories)
-  specificTerms.slice(0, 3).forEach(term => {
-    keywords.push(term);
+  // Add "best [dish]" for top dishes (like owner.com)
+  specificTerms.slice(0, 6).forEach(term => {
     keywords.push(`best ${term}`);
   });
 
-  // Add "near me" variations for top 2 terms
-  specificTerms.slice(0, 2).forEach(term => {
-    keywords.push(`${term} near me`);
-  });
-
-  return keywords.slice(0, 8); // Limit to 8 most relevant keywords
+  return keywords.slice(0, 6); // Return 6 highly specific "best [dish]" searches
 }
 
 /**
