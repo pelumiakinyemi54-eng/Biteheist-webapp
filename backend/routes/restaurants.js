@@ -968,6 +968,58 @@ function detectSearchVisibilityProblems(restaurant, rankings, avgPosition) {
 }
 
 /**
+ * Generate cuisine-specific keywords for search ranking
+ */
+function generateCuisineSpecificKeywords(cuisine) {
+  // Extract base cuisine type (e.g., "Mexican food" -> "mexican")
+  const baseCuisine = cuisine.toLowerCase().replace(' food', '').replace(' restaurant', '').trim();
+
+  // Cuisine-specific dishes and search terms
+  const cuisineSpecificTerms = {
+    'mexican': ['tacos', 'burritos', 'quesadillas', 'enchiladas', 'mexican restaurant'],
+    'italian': ['pizza', 'pasta', 'italian restaurant', 'lasagna', 'spaghetti'],
+    'chinese': ['chinese food', 'dim sum', 'fried rice', 'chinese restaurant', 'noodles'],
+    'japanese': ['sushi', 'ramen', 'japanese restaurant', 'hibachi', 'teriyaki'],
+    'thai': ['thai food', 'pad thai', 'curry', 'thai restaurant', 'noodles'],
+    'indian': ['indian food', 'curry', 'biryani', 'indian restaurant', 'tikka'],
+    'american': ['burgers', 'american food', 'steakhouse', 'bbq', 'american restaurant'],
+    'french': ['french restaurant', 'french cuisine', 'bistro', 'french food'],
+    'pizza': ['pizza', 'pizza restaurant', 'pizzeria', 'pizza delivery', 'best pizza'],
+    'sushi': ['sushi', 'sushi restaurant', 'japanese food', 'sushi bar', 'sashimi'],
+    'seafood': ['seafood restaurant', 'seafood', 'fish restaurant', 'lobster', 'crab'],
+    'steakhouse': ['steakhouse', 'steak restaurant', 'steaks', 'bbq', 'grill'],
+    'cafe': ['cafe', 'coffee shop', 'breakfast', 'brunch', 'bakery'],
+    'fast food': ['fast food', 'quick service', 'burgers', 'chicken'],
+    'vietnamese': ['vietnamese food', 'pho', 'banh mi', 'vietnamese restaurant'],
+    'korean': ['korean bbq', 'korean food', 'korean restaurant', 'bibimbap'],
+    'mediterranean': ['mediterranean food', 'gyros', 'falafel', 'mediterranean restaurant', 'kebab']
+  };
+
+  // Get specific terms for this cuisine, or use generic terms
+  let specificTerms = cuisineSpecificTerms[baseCuisine] || [
+    `${cuisine}`,
+    `${cuisine} restaurant`,
+    `${baseCuisine} food`
+  ];
+
+  // Generate final keywords with variations
+  const keywords = [];
+
+  // Add the most specific terms (dishes)
+  specificTerms.slice(0, 3).forEach(term => {
+    keywords.push(term);
+    keywords.push(`best ${term}`);
+  });
+
+  // Add "near me" variations for top 2 terms
+  specificTerms.slice(0, 2).forEach(term => {
+    keywords.push(`${term} near me`);
+  });
+
+  return keywords.slice(0, 8); // Limit to 8 most relevant keywords
+}
+
+/**
  * @route   POST /api/restaurants/keyword-ranking
  * @desc    Get keyword ranking across multiple cities
  * @access  Public
@@ -995,13 +1047,8 @@ router.post('/keyword-ranking', optionalAuth, async (req, res) => {
       cities = [{ name: city, distance: 0 }, ...surroundingCities];
     }
 
-    // Generate search variations
-    const keywords = [
-      `${cuisine}`,
-      `${cuisine} restaurant`,
-      `best ${cuisine}`,
-      `top ${cuisine}`
-    ];
+    // Generate CUISINE-SPECIFIC search variations
+    const keywords = generateCuisineSpecificKeywords(cuisine);
 
     const rankings = [];
     const allCompetitors = new Map(); // Track unique competitors across all searches
