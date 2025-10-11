@@ -573,54 +573,6 @@
         </div>
       </div>
 
-      <!-- Top Competitors in Your Market -->
-      <div class="card-shadow mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Top Competitors in Your Market</h2>
-        <p class="text-sm text-gray-600 mb-4">These are restaurants in your area serving the same cuisine type as you</p>
-
-        <!-- Empty State -->
-        <div v-if="getTopCompetitors(auditData).length === 0" class="text-center py-12">
-          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <p class="text-gray-500">No competitors found matching your search</p>
-          <button @click="searchQuery = ''" class="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
-            Clear search
-          </button>
-        </div>
-
-        <!-- Competitors List -->
-        <div v-else class="space-y-3">
-          <div
-            v-for="(competitor, index) in getAllCompetitors(auditData)"
-            :key="index"
-            class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
-          >
-            <div class="flex items-center space-x-4 flex-1">
-              <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <div class="font-semibold text-gray-900">{{ competitor.name }}</div>
-                <div class="flex items-center text-sm text-gray-600 mt-1">
-                  <span class="font-semibold text-gray-900 mr-1">{{ competitor.rating || 'N/A' }}</span>
-                  <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <span class="ml-1">{{ competitor.user_ratings_total || 0 }} reviews</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-sm font-semibold" :class="getRankingColorClass(index + 1)">
-                {{ index + 1 }}{{ getOrdinalSuffix(index + 1) }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Top 3 Issues to Fix -->
       <div class="card-shadow mb-8">

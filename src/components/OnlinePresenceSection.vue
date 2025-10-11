@@ -148,46 +148,43 @@
         </div>
       </div>
 
-      <!-- Top Competitors -->
-      <div v-if="rankingData.topCompetitors && rankingData.topCompetitors.length > 0">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          Top Competitors in Your Market
-        </h3>
+      <!-- Problems Detected -->
+      <div v-if="rankingData.problems && rankingData.problems.length > 0" class="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-red-900">
+            {{ rankingData.problems.length }} problem{{ rankingData.problems.length !== 1 ? 's' : '' }} costing you ${{ totalMonthlyCost }}/month
+          </h3>
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+
         <div class="space-y-3">
           <div
-            v-for="(competitor, index) in rankingData.topCompetitors"
-            :key="competitor.placeId"
-            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            v-for="(problem, index) in rankingData.problems"
+            :key="index"
+            class="flex items-start space-x-3 p-3 bg-white rounded-lg border border-red-100"
           >
-            <div class="flex items-center space-x-4">
-              <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center">
-                  <span class="text-white font-bold text-lg">{{ index + 1 }}</span>
-                </div>
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-xs">{{ index + 1 }}</span>
               </div>
-              <div>
-                <h4 class="text-sm font-semibold text-gray-900">{{ competitor.name }}</h4>
-                <div class="flex items-center space-x-3 mt-1">
-                  <div class="flex items-center">
-                    <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                    <span class="text-sm text-gray-700 font-medium">{{ competitor.rating }}</span>
-                  </div>
-                  <span class="text-xs text-gray-500">{{ competitor.totalRatings }} reviews</span>
-                  <span v-if="competitor.appearances" class="text-xs text-indigo-600 font-medium">
-                    Appears in {{ competitor.appearances }} searches
-                  </span>
-                </div>
-              </div>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">{{ problem.issue }}</p>
+              <p class="text-xs text-red-700 mt-1">Costing ~${{ problem.monthlyCost }}/month</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- No competitors message -->
-      <div v-else class="text-center py-8 bg-gray-50 rounded-lg">
-        <p class="text-gray-600">No direct competitors found in the analyzed searches.</p>
+      <!-- No problems detected -->
+      <div v-else class="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+        <svg class="mx-auto h-12 w-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-green-800 font-medium">No major issues detected</p>
+        <p class="text-sm text-green-600 mt-1">Your online presence looks good!</p>
       </div>
     </div>
 
@@ -221,6 +218,12 @@ export default {
       rankingData: null,
       loading: false,
       error: null
+    }
+  },
+  computed: {
+    totalMonthlyCost() {
+      if (!this.rankingData || !this.rankingData.problems) return 0;
+      return this.rankingData.problems.reduce((sum, problem) => sum + (problem.monthlyCost || 0), 0);
     }
   },
   methods: {
