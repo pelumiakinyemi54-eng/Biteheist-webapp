@@ -425,7 +425,7 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
       },
       messages,
       grade: revenueAnalysis.grade,
-      actionItems: generateActionItems(seoScore, pageSpeedScore, restaurant, competitors),
+      actionItems: generateActionItems(seoScore, pageSpeedScore, restaurant, competitors, rankingData),
       parameters: {
         monthlyVisitors,
         averageOrderValue: revenueAnalysis.parameters.averageOrderValue,
@@ -619,8 +619,38 @@ function calculateSeoScore(restaurant) {
 /**
  * Generate actionable items based on audit results
  */
-function generateActionItems(seoScore, pageSpeedScore, restaurant, competitors) {
+function generateActionItems(seoScore, pageSpeedScore, restaurant, competitors, rankingData) {
   const items = [];
+
+  // PRIORITY 1: Search Visibility Issues (if ranking is poor)
+  if (rankingData) {
+    const { googleRank, analysis } = rankingData;
+
+    // Add high-priority item if restaurant ranks poorly (outside top 10)
+    if (googleRank > 10) {
+      const totalRestaurants = analysis.similarRestaurants || competitors.length + 1;
+      const percentile = Math.round(((totalRestaurants - googleRank) / totalRestaurants) * 100);
+
+      items.push({
+        priority: 'high',
+        category: 'Search Visibility',
+        title: 'Poor search visibility across regions',
+        description: `Your restaurant ranks #${googleRank} out of ${totalRestaurants} similar restaurants in your area (${percentile}th percentile). Customers searching for your cuisine type are finding competitors first. Improving your Google Business Profile, SEO, and local presence can move you into the top 10 where most customers make their choice.`,
+        estimatedRevenue: 2000,
+        timeframe: '6-12 weeks'
+      });
+    } else if (googleRank > 5) {
+      // Medium priority if ranking is 6-10 (still room for improvement)
+      items.push({
+        priority: 'medium',
+        category: 'Search Visibility',
+        title: 'Opportunity to improve search ranking',
+        description: `You rank #${googleRank} among similar restaurants. Moving into the top 5 results can significantly increase customer discovery and foot traffic.`,
+        estimatedRevenue: 1200,
+        timeframe: '4-8 weeks'
+      });
+    }
+  }
 
   // SEO recommendations
   if (seoScore.score < 70) {
