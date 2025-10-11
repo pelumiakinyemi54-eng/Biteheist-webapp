@@ -299,16 +299,16 @@ router.post('/:placeId/audit', optionalAuth, async (req, res) => {
           );
         }
 
-        // Second fallback: If still no competitors, try 50km without food type filtering
+        // Final fallback: If still no competitors, try 50km but KEEP food type filtering
         if (competitors.length === 0) {
-          winston.info(`No competitors found in 25km, expanding to 50km radius without strict filtering`);
+          winston.info(`No competitors found in 25km, expanding to 50km radius with same food type`);
           competitors = await googlePlaces.findNearbyCompetitors(
             restaurant.location.lat,
             restaurant.location.lng,
             {
-              radius: 50000,  // 50km radius
-              maxResults: 10,
-              restaurantTypes: [] // Remove type filtering to get any restaurants
+              radius: 50000,  // 50km radius - very wide search
+              maxResults: 20,
+              restaurantTypes: restaurant.types || [] // KEEP filtering by food type
             }
           );
         }

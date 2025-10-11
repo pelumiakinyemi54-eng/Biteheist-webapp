@@ -208,11 +208,16 @@ class GooglePlacesService {
         };
       });
 
-      // Filter: keep only restaurants with similar food types (>30% similarity)
-      // OR if no food types available, keep all
+      // Filter: keep only restaurants with similar food types (>20% similarity)
+      // This ensures we only compare restaurants of the same cuisine type
       if (foodTypes.length > 0) {
-        scoredPlaces = scoredPlaces.filter(sp => sp.similarityScore > 30);
-        winston.info(`Filtered to ${scoredPlaces.length} restaurants with similar food type (>${30}% similarity)`);
+        scoredPlaces = scoredPlaces.filter(sp => sp.similarityScore > 20);
+        winston.info(`Filtered to ${scoredPlaces.length} restaurants with similar food type (>20% similarity)`);
+
+        // If we have at least some similar restaurants, use them
+        if (scoredPlaces.length === 0) {
+          winston.warn(`No restaurants found with similar food types (${foodTypes.join(', ')})`);
+        }
       }
 
       // Sort by similarity score (highest first), then by rating
